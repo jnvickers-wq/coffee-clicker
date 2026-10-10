@@ -46,7 +46,7 @@ button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
 <header>
 <div class="cup" aria-hidden="true">☕</div>
 <h1>Kickoff Order Form</h1>
-<p>Welcome to the founding team! Answer as many as you can. There are no wrong answers, and "I'm not sure yet" is a great answer. Your answers save on this device as you go.</p>
+<p>Welcome to the founding team! Each founder fills out their own copy. Answer as many as you can. There are no wrong answers, and "I'm not sure yet" is a great answer. Your answers save on this device as you go.</p>
 </header>
 
 <div class="progress"><div class="bar"><i id="fill"></i></div><span id="count">0 questions answered</span></div>
@@ -72,8 +72,9 @@ button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
 <script>
 var SECTIONS=[
 {t:"The Team",s:"Who is on this crew?",q:[
-["Your names, and what you want your job titles to be",1,"Example: Founder & Head Barista, Chief Marketing Officer"],
-["What is each of you best at?",1,"Drawing, math, talking to people, building, being organized..."]]},
+["What's your first name?",0,"Just your first name is perfect"],
+["What job title do you want?",0,"Example: Founder & Head Barista, Chief Marketing Officer"],
+["What are you best at?",1,"Drawing, math, talking to people, building, being organized..."]]},
 {t:"Our Company",s:"Every great coffee shop needs a great name.",q:[
 ["Company name ideas (list as many as you want)",1,"Silly, cute, or fancy all count"],
 ["Finish this sentence: We want customers to feel...",0,"Cozy? Happy? Fancy? Excited?"],
@@ -161,11 +162,12 @@ document.getElementById("email").onclick=function(){
 };
 var sb=document.getElementById("submit");
 sb.onclick=function(){
+ if(!(data.q0_0||"").trim()){msg.textContent="Please type your first name at the top first, so we know who this is from.";document.getElementById("q0_0").focus();return}
  var tq=ids.filter(function(p){return p[0].indexOf("q6_")===0&&(data[p[0]]||"").trim()}).length;
  if(!tq&&!confirm("You haven't answered the teacher and mom questions yet. Send your answers anyway?"))return;
  sb.disabled=true;msg.textContent="Sending your order...";
  fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
-  body:JSON.stringify({access_key:KEY,subject:"Coffee Clicker Kickoff answers",from_name:"Coffee Clicker Company",message:build()})})
+  body:JSON.stringify({access_key:KEY,subject:"Coffee Clicker answers from "+(data.q0_0||"").trim(),from_name:"Coffee Clicker Company",message:build()})})
  .then(function(r){return r.json()})
  .then(function(j){
   if(j.success){msg.textContent="Order sent! Great work, team. \u2615";fb.hidden=true}
