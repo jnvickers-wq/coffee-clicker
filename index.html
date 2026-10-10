@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kickoff Order Form: Our Coffee Clicker Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6ecdf;--card:#fffaf3;--ink:#3b2418;--muted:#7a5c4a;--line:#d9c3ab;--accent:#7d9a5b;--accent-ink:#fff;--pink:#e8a7a0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#241710;--card:#33221a;--ink:#f6e8d8;--muted:#c7a98f;--line:#5b4132;--accent:#9db878;--accent-ink:#20160f}}
+:root[data-theme="dark"]{--bg:#241710;--card:#33221a;--ink:#f6e8d8;--muted:#c7a98f;--line:#5b4132;--accent:#9db878;--accent-ink:#20160f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px 18px 80px}
+h1,h2{font-family:Fredoka,"Trebuchet MS",sans-serif;font-weight:600;margin:0}
+header{text-align:center;padding:12px 0 8px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.1}
+header p{color:var(--muted);max-width:46ch;margin:12px auto 0}
+.cup{font-size:3rem}
+section{background:var(--card);border:2px dashed var(--line);border-radius:22px;padding:22px 20px;margin-top:26px}
+h2{font-size:1.5rem;margin-bottom:4px}
+.sub{color:var(--muted);margin:0 0 14px}
+label{display:block;font-weight:600;margin-top:16px}
+.hint{display:block;font-weight:400;color:var(--muted);font-size:.9rem}
+textarea,input[type=text]{width:100%;margin-top:6px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:76px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.checks label{margin:0;font-weight:400;display:flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.checks input{accent-color:var(--accent);width:18px;height:18px}
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding:10px 0;margin-top:14px}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.progress span{font-size:.9rem;color:var(--muted)}
+.done{text-align:center}
+button{font:600 1.05rem Fredoka,sans-serif;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:12px 26px;cursor:pointer;margin:6px}
+button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+#out{display:none;margin-top:14px;min-height:200px;font-size:.9rem}
+.teacher{border-color:var(--pink)}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="cup" aria-hidden="true">☕</div>
+<h1>Kickoff Order Form</h1>
+<p>Welcome to the founding team! Answer as many as you can. There are no wrong answers, and "I'm not sure yet" is a great answer. Your answers save on this device as you go.</p>
+</header>
+
+<div class="progress"><div class="bar"><i id="fill"></i></div><span id="count">0 questions answered</span></div>
+
+<div id="form"></div>
+
+<section class="done">
+<h2>Order up!</h2>
+<p class="sub">All done? Press Submit and your answers go straight to your Chief Clicker Officer.</p>
+<button id="submit">Submit my answers</button>
+<p id="msg" class="sub" role="status"></p>
+<div id="fb" hidden>
+<p class="sub">Something didn't work. No problem, your answers are still saved. Try one of these:</p>
+<button class="alt" id="savefile">Save answers as a file</button>
+<button class="alt" id="email">Open my email app</button>
+<button class="alt" id="copy">Copy my answers</button>
+<button class="alt" id="show">Show my answers</button>
+<textarea id="out" readonly aria-label="Your answers"></textarea>
+</div>
+</section>
+</main>
+
+<script>
+var SECTIONS=[
+{t:"The Team",s:"Who is on this crew?",q:[
+["Your names, and what you want your job titles to be",1,"Example: Founder & Head Barista, Chief Marketing Officer"],
+["What is each of you best at?",1,"Drawing, math, talking to people, building, being organized..."]]},
+{t:"Our Company",s:"Every great coffee shop needs a great name.",q:[
+["Company name ideas (list as many as you want)",1,"Silly, cute, or fancy all count"],
+["Finish this sentence: We want customers to feel...",0,"Cozy? Happy? Fancy? Excited?"],
+["Pick 3 words that describe our brand",0,"Cozy, sparkly, cute, bold..."],
+["Favorite colors for our logo and booth",0,""]]},
+{t:"Our Products",s:"What goes on the menu?",q:[
+["Hot coffee mugs: which flavors should we make?",1,"Each flavor gets its own color inside the cup. Latte, mocha, matcha, caramel, strawberry..."],
+["Latte art: pick your top 3 designs for the top of the mug",0,"Keep it simple! Heart, flower, swirl, star, bear face, cat face, or one idea of your own"],
+["Iced drinks (clear, see-through cups): should they use the same flavors as the hot mugs, or different ones?",1,"Tell us which iced drinks you'd want, like iced latte, iced matcha, or strawberry"],
+["Baked goods: which 2 or 3 would be the most fun as clickers?",1,"Croissant, donut, cookie, cupcake, muffin..."],
+["Which one would you want for yourself, and why?",1,""]]},
+{t:"Our Customers",s:"Who is going to buy these?",q:[
+["Who are our customers?",0,"Which grades? Boys, girls, teachers, parents?"],
+["Why do kids love clickers?",1,"What makes a good one?"],
+["What is the most you would pay in popsicle sticks for one?",0,"Think about what other booths might charge"],
+["What would make you pick our booth instead of another?",1,""]]},
+{t:"Marketing and Packaging",s:"How do we get everyone excited?",q:[
+["Cool ways to get people to visit our booth",1,"Posters, a free sample, a secret menu, a contest..."],
+["Packaging ideas",1,"A little coffee cup sleeve? A to-go bag? A menu card?"],
+["Special deals you can think of",1,"Buy 2 get a discount? A loyalty punch card? A bundle?"],
+["How should we dress and decorate the booth?",1,"Aprons, name tags, a chalkboard menu..."]]},
+{t:"Planning Ahead",s:"What are you worried about or excited about?",q:[
+["What are you most excited about?",1,""],
+["What worries you a little?",1,""],
+["What would make this project a huge success for you?",1,""]]},
+{t:"Ask Your Teacher or Your Mom",s:"We need these answers to plan everything. Ask your teacher or your mom this week, then type in what they say.",q:[
+["What day is Marketplace, and how many days do we get to sell?",0,""],
+["Are there any deadlines before Marketplace?",1,"Anything we have to turn in or show before then"],
+["What do we have to show or turn in at the end?",1,""],
+["How big is our table, and what are we allowed to bring?",1,""],
+["Are there any rules about prices or popsicle sticks?",1,""],
+["Can we use a poster, a slideshow, or a screen?",0,""]]}
+];
+var K="clicker-kickoff-v1",data={};
+try{data=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(data))}catch(e){}update()}
+function el(h){var d=document.createElement("div");d.innerHTML=h;return d.firstChild}
+var form=document.getElementById("form"),ids=[];
+SECTIONS.forEach(function(sec,i){
+ var s=el('<section><h2></h2><p class="sub"></p></section>');
+ s.querySelector("h2").textContent=sec.t;s.querySelector(".sub").textContent=sec.s;
+ sec.q.forEach(function(q,j){
+  var id="q"+i+"_"+j;ids.push([id,q[0]]);
+  var l=el("<label></label>");l.setAttribute("for",id);l.textContent=q[0];
+  if(q[2]){var h=el('<span class="hint"></span>');h.textContent=q[2];l.appendChild(h)}
+  var f=document.createElement(q[1]?"textarea":"input");if(!q[1])f.type="text";
+  f.id=id;f.value=data[id]||"";
+  f.addEventListener("input",function(){data[id]=f.value;save()});
+  s.appendChild(l);s.appendChild(f);
+ });
+ form.appendChild(s);
+});
+function update(){
+ var n=ids.filter(function(p){return (data[p[0]]||"").trim()}).length;
+ document.getElementById("fill").style.width=Math.round(n/ids.length*100)+"%";
+ document.getElementById("count").textContent=n+" of "+ids.length+" questions answered";
+}
+function build(){
+ var out="KICKOFF ORDER FORM ANSWERS\n\n";
+ ids.forEach(function(p){out+=p[1]+"\n"+((data[p[0]]||"").trim()||"(not answered)")+"\n\n"});
+ return out;
+}
+var out=document.getElementById("out"),msg=document.getElementById("msg");
+document.getElementById("show").onclick=function(){out.value=build();out.style.display="block";out.select()};
+document.getElementById("copy").onclick=function(){
+ var t=build();out.value=t;
+ var ok=false;
+ try{if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){msg.textContent="Copied! Now paste it into your chat."},function(){fallback()});return}}catch(e){}
+ fallback();
+ function fallback(){out.style.display="block";out.select();try{ok=document.execCommand("copy")}catch(e){}
+  msg.textContent=ok?"Copied! Now paste it into your chat.":"Press and hold the box below, then choose Copy."}
+};
+var TO="jnvickers@gmail.com",KEY="6f685ae4-0fb7-47ff-b8a3-2478ed20a59f",fb=document.getElementById("fb");
+function saveFile(){
+ var b=new Blob([build()],{type:"text/plain"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(b);a.download="coffee-clicker-answers.txt";
+ document.body.appendChild(a);a.click();a.remove();
+}
+document.getElementById("savefile").onclick=function(){
+ saveFile();msg.textContent="Saved! Find coffee-clicker-answers.txt in Downloads and attach it to an email."};
+document.getElementById("email").onclick=function(){
+ var t=build(),body=t.length<1500?t:"My answers are in the file coffee-clicker-answers.txt. Please attach it from Downloads.";
+ if(t.length>=1500)saveFile();
+ window.location.href="mailto:"+TO+"?subject="+encodeURIComponent("Our Coffee Clicker answers")+"&body="+encodeURIComponent(body);
+};
+var sb=document.getElementById("submit");
+sb.onclick=function(){
+ var tq=ids.filter(function(p){return p[0].indexOf("q6_")===0&&(data[p[0]]||"").trim()}).length;
+ if(!tq&&!confirm("You haven't answered the teacher and mom questions yet. Send your answers anyway?"))return;
+ sb.disabled=true;msg.textContent="Sending your order...";
+ fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+  body:JSON.stringify({access_key:KEY,subject:"Coffee Clicker Kickoff answers",from_name:"Coffee Clicker Company",message:build()})})
+ .then(function(r){return r.json()})
+ .then(function(j){
+  if(j.success){msg.textContent="Order sent! Great work, team. \u2615";fb.hidden=true}
+  else throw new Error("fail")})
+ .catch(function(){msg.textContent="We couldn't send it just now.";fb.hidden=false;sb.disabled=false});
+};
+var clr=document.getElementById("clear");if(clr)clr.onclick=function(){
+ if(!confirm("Erase all answers and start over?"))return;
+ data={};try{localStorage.removeItem(K)}catch(e){}location.reload();
+};
+update();
+</script>
+</body>
+</html>
