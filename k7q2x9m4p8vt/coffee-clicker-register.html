@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Register">
+<meta name="robots" content="noindex, nofollow">
+<title>Register</title>
+
+<!-- ==========================================================================
+     THEME  (EDIT ME: colors, fonts, and logo all live in this one block)
+     The girls are still choosing, so swap values here and nothing else changes.
+     - Colors: change the hex values. Everything else in the file uses these names.
+     - Fonts: the register must work offline, so these are "named fonts with
+       fallbacks". If Fredoka/Nunito are not on the iPad, the fallbacks are used.
+       To get the real fonts offline, paste a base64 @font-face (template below).
+     - Logo: set --logo-url to url("...") with a picture file next to this page,
+       or a data: address pasted in (works offline, one self-contained file).
+       Leave it as "none" and the register shows the company name as text.
+   ========================================================================== -->
+<style id="theme">
+:root{
+  /* ---- Brand kit starting colors (from clicker-cafe-brand-kit.html) ---- */
+  --latte-foam:#F3E3C8;
+  --espresso:#2E1D16;
+  --chalkboard:#26322D;
+  --sunny-sip:#F2A93B;
+  --mint-chip:#8FD1B5;
+  --berry-swirl:#C2456B;
+
+  /* ---- Supporting colors (shades that go with the kit) ---- */
+  --chalk:#F7F1E3;            /* chalk-white text on dark boards */
+  --chalkboard-2:#33423B;     /* lighter board for buttons */
+  --chalkboard-line:#52645B;  /* board borders and dashes */
+  --chalkboard-off:#59675F;   /* disabled button on the board */
+  --chalkboard-off-text:#9AA8A0;
+  --tan:#E6CFA8;              /* soft buttons and tabs */
+  --tan-line:#D3B98F;         /* dashed lines on light cards */
+  --white:#FFFFFF;
+  --blush:#FFB4A2;            /* friendly error text on the board */
+  --alert-dark:#5A2B2B;       /* setup-note box */
+  --stick-top:#EBCB92; --stick-bottom:#D9AE6A; --stick-edge:#B88B4A; /* popsicle sticks */
+  --tint-HOT:#FBD9C8; --tint-ICE:#D5EAF5; --tint-BAK:#F8EBBE; --tint-other:#E9E2D2; /* tile backgrounds by line */
+  --shadow:rgba(46,29,22,.2);
+  --scrim:rgba(30,18,12,.65);
+
+  /* ---- Roles: which brand color does which job ---- */
+  --bg:var(--latte-foam);       /* page background */
+  --ink:var(--espresso);        /* main text, header bar, selected buttons */
+  --board:var(--chalkboard);    /* sign-in screen and order board */
+  --accent:var(--sunny-sip);    /* main action buttons, "low" warnings */
+  --good:var(--mint-chip);      /* "all good" chips */
+  --alert:var(--berry-swirl);   /* sold out, damaged, warnings */
+
+  /* ---- Fonts (named font first, then offline-safe fallbacks) ---- */
+  --font-display:"Fredoka","Chalkboard SE","Marker Felt","Avenir Next Rounded",ui-rounded,system-ui,sans-serif;
+  --font-body:"Nunito","Avenir Next",-apple-system,system-ui,sans-serif;
+
+  /* ---- Logo: the ONE spot. Examples:
+        --logo-url:url("logo.png");
+        --logo-url:url("data:image/svg+xml;base64,PASTE_HERE");  ---- */
+  --logo-url:none;
+  --logo-header-size:44px;    /* height in the top bar */
+  --logo-login-size:120px;    /* height on the sign-in screen */
+}
+/* Optional: real fonts offline. Paste your base64 here, then delete this comment's markers.
+@font-face{font-family:"Fredoka";src:url("data:font/woff2;base64,PASTE_HERE") format("woff2");font-weight:400 700;}
+@font-face{font-family:"Nunito";src:url("data:font/woff2;base64,PASTE_HERE") format("woff2");font-weight:400 800;}
+*/
+</style>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:auto;user-select:auto}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:20px}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+#app{height:100%;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.logo{background:var(--logo-url) center/contain no-repeat;aspect-ratio:1/1;flex:none}
+.logo.hdr{height:var(--logo-header-size)}
+.logo.big{height:var(--logo-login-size);margin-bottom:4px}
+/* login */
+.login{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--board);color:var(--chalk);text-align:center}
+.login h1{font-family:var(--font-display);font-size:50px;margin:0}
+.login p{margin:0 0 6px;font-size:24px;opacity:.85}
+.dots{display:flex;gap:18px;height:34px;margin:10px 0}
+.dots i{width:26px;height:26px;border-radius:50%;border:3px solid var(--chalk)}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.msg{height:28px;font-size:22px;color:var(--blush)}
+.pad{display:grid;grid-template-columns:repeat(3,100px);gap:12px}
+.pad button{height:86px;border-radius:22px;background:var(--chalkboard-2);color:var(--chalk);font-size:38px;font-family:var(--font-display);border:2px solid var(--chalkboard-line)}
+.pad button:active{background:var(--accent);color:var(--ink)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.setup{max-width:560px;margin-top:8px;padding:8px 14px;border-radius:12px;background:var(--alert-dark);font-size:16px;text-align:left}
+/* register */
+.reg{height:100%;display:grid;grid-template-columns:1fr 370px;grid-template-rows:auto 1fr}
+header{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--ink);color:var(--chalk)}
+header h2{font-family:var(--font-display);font-size:28px;margin:0;flex:1}
+header .who{font-size:19px;opacity:.9}
+.hbtn{padding:12px 20px;border-radius:14px;background:var(--chalkboard-2);color:var(--chalk);font-size:19px;font-weight:700;min-height:52px}
+.hbtn.sun{background:var(--accent);color:var(--ink)}
+.warn{background:var(--alert);color:#fff;padding:10px 18px;font-size:17px;font-weight:700}
+.warn.low{background:var(--accent);color:var(--ink)}
+.shop{display:flex;flex-direction:column;min-height:0}
+.tabs{display:flex;gap:10px;padding:12px 14px 0}
+.tabs button{flex:1;min-height:58px;border-radius:16px;background:var(--tan);font-family:var(--font-display);font-size:23px}
+.tabs button.on{background:var(--ink);color:var(--chalk)}
+.grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));grid-auto-rows:min-content;gap:14px;padding:14px}
+.tile{background:var(--white);border-radius:22px;padding:0 0 12px;text-align:center;box-shadow:0 3px 0 var(--shadow);overflow:hidden;position:relative}
+.tile:active{transform:translateY(2px);box-shadow:none}
+.tile .pic{height:118px;display:flex;align-items:center;justify-content:center}
+.tile svg{width:96px;height:96px}
+.tile b{display:block;font-family:var(--font-display);font-size:23px;margin:8px 6px 2px}
+.tile .price{display:inline-block;background:var(--ink);color:var(--chalk);border-radius:20px;padding:4px 14px;font-weight:800;font-size:21px}
+.tile small{display:block;margin-top:6px;font-size:14px;opacity:.55;letter-spacing:.04em}
+.tile .qty{position:absolute;top:8px;right:8px;min-width:36px;height:36px;border-radius:18px;background:var(--accent);font-weight:800;font-size:21px;display:flex;align-items:center;justify-content:center}
+.tile .stk{position:absolute;top:8px;left:8px;border-radius:14px;padding:4px 10px;font-size:15px;font-weight:800;background:rgba(255,255,255,.85)}
+.tile .stk.low{background:var(--accent)}
+.tile .stk.out{background:var(--alert);color:#fff}
+/* cart = chalkboard */
+.cart{background:var(--board);color:var(--chalk);display:flex;flex-direction:column;min-height:0;border-left:6px solid var(--ink)}
+.cart h3{font-family:var(--font-display);font-size:29px;margin:0;padding:14px 18px 8px}
+.lines{flex:1;overflow:auto;padding:0 14px}
+.empty{padding:30px 10px;text-align:center;font-family:var(--font-display);font-size:23px;opacity:.7}
+.line{display:grid;grid-template-columns:1fr auto;gap:4px 8px;padding:10px 4px;border-bottom:2px dashed var(--chalkboard-line);align-items:center}
+.line .n{font-weight:800;font-size:20px}.line .n small{display:block;font-weight:600;font-size:13px;opacity:.65}
+.line .n small.over{color:var(--blush);opacity:1;font-size:14px}
+.line .t{font-size:20px;font-weight:800;text-align:right}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:54px;height:54px;border-radius:14px;background:var(--chalkboard-2);border:2px solid var(--chalkboard-line);color:var(--chalk);font-size:30px}
+.step span{min-width:30px;text-align:center;font-size:23px;font-weight:800}
+.foot{padding:12px 16px 16px;border-top:3px solid var(--ink)}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-display);font-size:27px;margin-bottom:10px}
+.total b{font-size:42px;color:var(--accent)}
+.big{width:100%;min-height:74px;border-radius:20px;background:var(--accent);color:var(--ink);font-family:var(--font-display);font-size:31px;font-weight:700}
+.big:disabled{background:var(--chalkboard-off);color:var(--chalkboard-off-text)}
+.link{display:block;margin:10px auto 0;background:none;color:var(--chalk);opacity:.85;font-size:18px;text-decoration:underline;min-height:46px}
+/* modal */
+#modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--scrim);z-index:9;padding:16px}
+#modal.show{display:flex}
+.card{background:var(--bg);border-radius:28px;padding:24px;width:100%;max-width:560px;max-height:100%;overflow:auto;text-align:center}
+.card.wide{max-width:740px}
+.card h3{font-family:var(--font-display);font-size:34px;margin:0 0 8px}
+.card p{margin:6px 0}
+.bigmoney{font-family:var(--font-display);font-size:56px;margin:4px 0}
+.row{display:flex;gap:10px;margin-top:14px}.row>*{flex:1}
+.btn{min-height:66px;border-radius:18px;background:var(--tan);font-size:23px;font-weight:700;font-family:var(--font-display);padding:0 14px}
+.btn.go{background:var(--ink);color:var(--chalk)}.btn.sun{background:var(--accent)}.btn.bad{background:var(--alert);color:#fff}
+.btn:disabled{opacity:.4}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.npad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.npad button{min-height:64px;border-radius:16px;background:var(--white);font-size:31px;font-family:var(--font-display);box-shadow:0 2px 0 var(--shadow)}
+.npad button:active{background:var(--accent)}
+.sticks{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:10px 0;min-height:48px}
+.stick{width:14px;height:46px;border-radius:7px;background:linear-gradient(var(--stick-top),var(--stick-bottom));border:2px solid var(--stick-edge)}
+.sales{text-align:left;margin-top:10px}
+.sale{padding:10px 4px;border-bottom:2px dashed var(--tan-line);font-size:18px}.sale b{font-family:var(--font-display)}
+.sale small{display:block;opacity:.75;font-size:16px}
+.tag{display:inline-block;border-radius:12px;padding:2px 10px;font-size:14px;font-weight:800;background:var(--alert);color:#fff;margin-left:6px;vertical-align:middle}
+/* return flow */
+.salebtn{display:block;width:100%;text-align:left;min-height:68px;border-radius:16px;background:var(--white);padding:10px 16px;margin-bottom:8px;font-size:20px;box-shadow:0 2px 0 var(--shadow)}
+.salebtn small{display:block;opacity:.7;font-size:16px}
+.rline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:10px 4px;border-bottom:2px dashed var(--tan-line);text-align:left}
+.rline b{font-family:var(--font-display);font-size:23px}
+.rline small{display:block;opacity:.7;font-size:15px}
+.mstep{display:flex;align-items:center;gap:8px}
+.mstep button{width:58px;height:58px;border-radius:14px;background:var(--tan);font-size:32px}
+.mstep button:disabled{opacity:.35}
+.mstep span{min-width:36px;text-align:center;font-size:26px;font-weight:800}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.rsn{min-height:92px;border-radius:20px;background:var(--tan);font-family:var(--font-display);font-size:25px;padding:8px}
+.rsn small{display:block;font-family:var(--font-body);font-size:15px;font-weight:700;opacity:.75;margin-top:2px}
+.rsn.on{background:var(--ink);color:var(--chalk)}
+.rsn.on.noback{background:var(--alert);color:#fff}
+.err{color:var(--alert);font-weight:800;min-height:26px}
+/* back office */
+.office{height:100%;display:flex;flex-direction:column}
+.otabs{display:flex;gap:8px;padding:12px 14px 0;overflow-x:auto;flex:none}
+.otabs button{flex:1 0 auto;min-height:60px;padding:0 12px;border-radius:16px;background:var(--tan);font-family:var(--font-display);font-size:19px}
+.otabs button.on{background:var(--ink);color:var(--chalk)}
+#omain{flex:1;overflow:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.panel{background:var(--white);border-radius:22px;padding:16px 18px;margin-bottom:14px;box-shadow:0 3px 0 var(--shadow)}
+.panel h3{font-family:var(--font-display);font-size:28px;margin:0 0 6px}
+.panel p{margin:6px 0}
+.hint{font-size:17px;opacity:.75}
+.scroll{overflow-x:auto}
+.tbl{min-width:780px}
+.trow{display:grid;grid-template-columns:minmax(220px,2.4fr) repeat(5,minmax(70px,1fr)) minmax(80px,1.1fr) minmax(120px,1.2fr);gap:8px;align-items:center;padding:10px 6px;border-bottom:2px dashed var(--tan-line);font-size:21px;text-align:center}
+.trow.head{font-size:15px;font-weight:800;opacity:.7;position:sticky;top:0;background:var(--white);z-index:1}
+.trow .nm{display:flex;align-items:center;gap:10px;text-align:left;font-weight:800}
+.trow .nm small{display:block;font-weight:600;font-size:14px;opacity:.6}
+.trow .on{font-family:var(--font-display);font-size:30px}
+.mini svg{width:50px;height:50px;display:block}
+.mini{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.cellbtn{min-height:54px;min-width:70px;border-radius:14px;background:var(--bg);font:inherit;font-weight:800;border:2px dashed var(--tan-line)}
+.chip{display:inline-block;border-radius:16px;padding:6px 12px;font-weight:800;font-size:17px;background:var(--tan)}
+.chip.ok{background:var(--good)}.chip.low{background:var(--accent)}.chip.out,.chip.bad{background:var(--alert);color:#fff}
+.neg{color:var(--alert);font-weight:800}
+.crow{display:grid;grid-template-columns:minmax(200px,2fr) 90px 130px minmax(130px,1.2fr);gap:10px;align-items:center;padding:12px 6px;border-bottom:2px dashed var(--tan-line);font-size:21px;text-align:center}
+.crow .nm{display:flex;align-items:center;gap:10px;text-align:left;font-weight:800}
+.crow .nm small{display:block;font-weight:600;font-size:14px;opacity:.6}
+.crow .reasons{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start;padding-left:66px}
+.rbtn{min-height:54px;padding:0 18px;border-radius:14px;background:var(--tan);font-weight:800;font-size:19px}
+.rbtn.on{background:var(--ink);color:var(--chalk)}
+.rsrow{display:grid;grid-template-columns:minmax(200px,2fr) 90px auto;gap:10px;align-items:center;padding:10px 6px;border-bottom:2px dashed var(--tan-line);font-size:21px}
+.rsrow .nm{display:flex;align-items:center;gap:10px;font-weight:800}
+.rsrow .nm small{display:block;font-weight:600;font-size:14px;opacity:.6}
+.rsrow .mstep{justify-content:flex-end}
+.rsrow .mstep .plus5{width:70px;font-size:22px;font-weight:800}
+.datein{font:inherit;font-size:24px;padding:10px 14px;border-radius:14px;border:2px solid var(--tan-line);background:var(--bg);min-height:58px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:8px 0}
+.stat{background:var(--bg);border-radius:18px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--font-display);font-size:38px}
+.stat span{font-size:16px;font-weight:700;opacity:.8}
+.bar{position:sticky;bottom:0;background:var(--bg);padding:12px 0 4px;display:flex;gap:10px}
+.bar>*{flex:1}
+.rec{padding:10px 6px;border-bottom:2px dashed var(--tan-line);font-size:18px;text-align:left}
+.rec b{font-family:var(--font-display)}
+.rec small{display:block;opacity:.75;font-size:15px}
+.sync{display:inline-block;border-radius:14px;padding:5px 12px;font-size:15px;font-weight:800;white-space:nowrap}
+.sync.ok{background:var(--good);color:var(--ink)}.sync.wait{background:var(--accent);color:var(--ink)}.sync.busy{background:var(--chalkboard-2);color:var(--chalk)}.sync.off{background:var(--chalkboard-2);color:var(--chalk);opacity:.8}
+code{font-size:.85em;background:var(--bg);padding:1px 6px;border-radius:6px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--chalk);padding:14px 26px;border-radius:24px;font-family:var(--font-display);font-size:24px;z-index:20;display:none;max-width:90%;text-align:center}
+.grp{font-family:var(--font-display);font-size:24px;padding:14px 8px 6px;margin-top:6px}
+.grp small{font-family:var(--font-body);font-size:15px;font-weight:700;opacity:.65;margin-left:8px}
+.rsn small.gone{color:var(--alert);opacity:1}
+.rsn .bi{display:inline-block;width:46px;height:46px;vertical-align:middle;margin-right:8px}
+.rsn .bi svg{width:100%;height:100%;display:block}
+@media (orientation:portrait){
+ .reg{grid-template-columns:1fr;grid-template-rows:auto 1fr 40%}
+ .cart{border-left:0;border-top:6px solid var(--ink)}
+ .cart h3{padding:8px 18px 2px;font-size:25px}
+}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+/* ============================================================
+   EDIT ME: everything you will change later lives in CONFIG.
+   - Prices are WHOLE popsicle sticks.
+   - Every PIN must be exactly 4 digits and different from the others.
+   - SKU prefix (HOT / ICE / BAK) must match a key in "lines".
+   - "color" is the flavor color drawn on the picture tile.
+   - "icon" can be: mug, iced, cookie, muffin
+   - "stock" is the STARTING stock (pieces printed before opening).
+     The manager can change it later on the Stock screen.
+   - "low" (optional) overrides lowStock for one item.
+
+   THREE WAYS TO DO FLAVORS AND LATTE ART:
+   Way 1: every flavor is its own item with its own SKU (HOT-001 Latte Mug,
+          HOT-002 Mocha Mug ...). Stock is per item.
+   Way 2: one item with an "options" list where each combo is a separate piece
+          (a Mocha with a Star is a different print than a Mocha with a Flower).
+          Every combo gets its own stock and its own variant SKU, like
+          HOT-001-MOC-STR. See HOT-001 below.
+   Way 3: one item with "options" and trackStock: "item". The cashier still
+          picks, and the sale remembers the pick, but stock is one shared number
+          for the whole item. See ICE-001 below.
+   "options" is a list of steps the cashier taps through. Each step has a label
+   and a list of values: { code, name, color, art }
+     code  = letters/numbers only, used in the variant SKU (MOC, STR ...)
+     name  = what the girls see
+     color = optional, tints the picture (the first color found is used)
+     art   = optional: heart, star, flower, swirl (drawn on top of the mug)
+   "comboStock" (optional) gives one combo a different starting stock, like
+   comboStock: { "MOC-STR": 6 }. A combo with starting stock 0 and no activity is
+   hidden from the register and the Stock and Count screens until you Restock it.
+   You can mix all three ways in the same menu.
+   Changing "items" changes the register tiles AND the stock list.
+
+   PHASE 3: THE MENU NOW LIVES IN THE GOOGLE SHEET.
+   Once "sync.url" is filled in, the register downloads the menu from the Sheet's
+   Menu, Options, Lines and Settings tabs, keeps a copy on the iPad for offline use,
+   and uses it instead of companyName / lines / lowStock / items below.
+   The items below are only the BUILT-IN menu: used until the first Sheet download.
+   PINs, cashiers and reasons always stay in this file (never in the Sheet).
+   ============================================================ */
+const CONFIG = {
+  /* Google Sheet link. url = the Web app URL from Apps Script (Deploy > Manage deployments).
+     key must match SECRET at the top of the Apps Script. Leave url "" to run without a Sheet. */
+  sync: { url: "https://script.google.com/macros/s/AKfycbwRnxTBtxziVypa4A2l0fqyHUDkXrJaPHiHTCLI2yCx-Cmn7t4_OL7d6XMKZe03b04W/exec", key: "2r1Kx6Tyqu2azV6EjtJiCZJ8", everySeconds: 30 },
+  companyName: "Clicker Café",
+  tagline: "Sign in with your PIN",
+  unit: ["stick", "sticks"],
+  cashiers: [                                  // PLACEHOLDERS: first names/titles only
+    { name: "Cashier A", title: "Cashier", pin: "1111" },
+    { name: "Cashier B", title: "Cashier", pin: "2222" }
+  ],
+  manager: { name: "Manager", title: "SVP of Printing", pin: "9999" },
+  lines: { HOT: "Hot", ICE: "Iced", BAK: "Baked" },
+  lowStock: 3,                                 // "running low" at this many or fewer
+  items: [                                     // PLACEHOLDERS until the real menu is chosen
+    { sku: "HOT-001", name: "Hot Mug", icon: "mug", color: "#C98B5A", price: 3, stock: 4, low: 1,       // stock = starting stock PER COMBO
+      options: [
+        { label: "Flavor",    values: [ { code: "LAT", name: "Latte",  color: "#C98B5A" }, { code: "MOC", name: "Mocha",  color: "#6B3E26" }, { code: "MAT", name: "Matcha", color: "#8DB36A" } ] },
+        { label: "Latte art", values: [ { code: "FLR", name: "Flower", art: "flower" },   { code: "STR", name: "Star",   art: "star" },    { code: "HRT", name: "Heart",  art: "heart" } ] } ] },
+    { sku: "ICE-001", name: "Iced Latte", icon: "iced", color: "#D9A66C", price: 4, stock: 8, trackStock: "item",   // shared stock
+      options: [ { label: "Syrup", values: [ { code: "VAN", name: "Vanilla", color: "#F3E3C8" }, { code: "CAR", name: "Caramel", color: "#D9A66C" }, { code: "MNT", name: "Mint", color: "#8FD1B5" } ] } ] },
+    { sku: "ICE-002", name: "Iced Berry", icon: "iced",   color: "#C2456B", price: 4, stock: 8 },
+    { sku: "BAK-001", name: "Cookie",     icon: "cookie", color: "#D9A25F", price: 2, stock: 12 },
+    { sku: "BAK-002", name: "Muffin",     icon: "muffin", color: "#E7B563", price: 2, stock: 12 }
+  ],
+  /* Why a customer returns something. restock:true = goes back on the shelf.
+     restock:false = it is NOT put back; it counts as shrinkage instead. */
+  returnReasons: [
+    { id: "changed-mind", label: "Changed mind",     restock: true },
+    { id: "wrong-item",   label: "Wrong item",       restock: true },
+    { id: "damaged",      label: "Damaged",          restock: false },
+    { id: "rang-wrong",   label: "Rang it up wrong", restock: true },
+    { id: "other",        label: "Something else",   restock: true }
+  ],
+  /* End-of-day count: why the shelf has fewer (or more) than the register expects. */
+  countReasons: {
+    short: [ { id: "misprint", label: "Misprint" }, { id: "broken", label: "Broken" }, { id: "sample", label: "Sample" },
+             { id: "gift", label: "Gift" }, { id: "lost", label: "Can't find it" } ],
+    extra: [ { id: "found", label: "Found extra" }, { id: "miscount", label: "Counted wrong before" } ]
+  }
+};
+/* ===================== end of CONFIG =====================
+
+   HOW SAVED RECORDS ARE SHAPED (so Phase 3 Google Sheets sync is easy):
+   Every record has a unique "id", an ISO "time", a local "date" (YYYY-MM-DD),
+   and the iPad's "device" id. Each array below becomes one sheet tab.
+     sales[]    id, no, time, date, device, cashier, lines[{sku,label,flavor,qty,sticks}], total, paid, change
+     returns[]  id, no, time, date, device, cashier, saleId, saleNo, sku, label, flavor, qty, unit, sticks, reason, restocked
+                (one row per item line; lines from one customer share "no")
+     restocks[] id, batch, time, date, device, by, sku, qty         (date = the day pieces were printed)
+     counts[]   id, no, time, date, device, by, rows[{sku,expected,counted,diff,reason}]
+     start{}    sku -> {qty,time,by}                                 (starting stock)
+   Stock is never saved as a number. It is always figured out from these records:
+     on hand = start + restocked - sold + returned to shelf + count corrections
+   "sku" in a record is the STOCK sku: a variant SKU like HOT-001-MOC-STR when options are counted
+   per combo, otherwise the plain item SKU. "label" is a readable name saved with each sale and
+   return line. "flavor" is only used for options that share one stock number (Way 3). */
+
+const KEY = "coffee-clicker-pos-v1";   // same key as Phase 1, so test sales carry over
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sticks = n => n + " " + CONFIG.unit[n === 1 ? 0 : 1];
+let ITEMS = [], STOCK = [];
+const USERS = [...CONFIG.cashiers.map(c => ({ ...c, role: "cashier" })), { ...CONFIG.manager, role: "manager" }];
+/* Every thing we count is a "stock entity": a plain item, or one combo of an item with options. */
+function combosOf(item) {
+  let out = [{ codes: [], names: [], color: null, art: null }];
+  item.options.forEach(o => { const n = []; out.forEach(c => (o.values || []).forEach(v => n.push({ codes: [...c.codes, v.code], names: [...c.names, v.name], color: c.color || v.color || null, art: c.art || v.art || null }))); out = n; });
+  return out;
+}
+/* Builds ITEMS and STOCK from CONFIG. Runs at start and again whenever a new menu arrives from the Sheet. */
+function buildMenu() {
+  ITEMS = CONFIG.items.filter(i => i && i.sku).map(i => ({ ...i, sku: String(i.sku).trim().toUpperCase(), price: Math.max(0, Math.round(Number(i.price) || 0)), stock: Math.max(0, Math.round(Number(i.stock) || 0)), line: String(i.sku).trim().toUpperCase().split("-")[0], options: (i.options || []).filter(o => o && o.values && o.values.length) }));
+  STOCK = [];
+  ITEMS.forEach(i => {
+    if (i.options.length && i.trackStock !== "item") {
+      combosOf(i).forEach(c => { const code = c.codes.join("-"), cs = i.comboStock && i.comboStock[code];
+        STOCK.push({ ...i, parent: i.sku, sku: i.sku + "-" + code, variant: c.names.join(" \u00b7 "), codes: c.codes, color: c.color || i.color, art: c.art || i.art, stock: cs != null ? Math.max(0, Math.round(cs)) : i.stock, isVariant: true }); });
+    } else STOCK.push({ ...i, parent: i.sku, variant: null });
+  });
+}
+const onMenu = i => i.on !== false;   // unticked "On menu?" in the Sheet = hidden from the register
+const dispName = e => e.name + (e.variant ? " \u00b7 " + e.variant : "");
+const entName = e => e.isVariant ? e.variant : e.name;
+const itemOf = sku => STOCK.find(i => i.sku === sku) || ITEMS.find(i => i.sku === sku) || { sku, parent: sku, name: sku, price: 0, stock: 0, line: sku.split("-")[0], icon: "", color: "#ccc", retired: true };
+const keyOf = l => l.sku + (l.flavor ? "|" + l.flavor : "");
+const parseKey = k => { const p = k.split("|"); return { sku: p[0], flavor: p[1] || null }; };
+const lineName = k => { const p = parseKey(k), i = itemOf(p.sku); return dispName(i) + (p.flavor ? " (" + p.flavor + ")" : ""); };
+const localDate = (d = new Date()) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const fmtTime = t => new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+const fmtDay = t => new Date(t).toLocaleDateString([], { month: "short", day: "numeric" });
+const fmtDateKey = d => { const [y, m, dd] = d.split("-").map(Number); return new Date(y, m - 1, dd).toLocaleDateString([], { month: "short", day: "numeric" }); };
+const reasonLabel = id => { const all = [...CONFIG.returnReasons, ...CONFIG.countReasons.short, ...CONFIG.countReasons.extra]; const r = all.find(x => x.id === id); return r ? r.label : id; };
+const hasLogo = () => { const v = getComputedStyle(document.documentElement).getPropertyValue("--logo-url").trim(); return v !== "" && v !== "none"; };
+const logo = cls => hasLogo() ? `<div class="logo ${cls}" role="img" aria-label="${esc(CONFIG.companyName)} logo"></div>` : "";
+
+function blank() { return { v: 3, device: "D" + Math.random().toString(36).slice(2, 8), sales: [], returns: [], restocks: [], counts: [], start: {}, startLog: [], sent: {}, syncBad: {}, lastSync: null, draft: { counted: {}, reason: {} }, next: 1, nextRet: 1, nextCount: 1 }; }
+let store = blank(), canSave = true;
+let user = null, pin = "", cart = {}, tab = "ALL", tender = "", pending = null;
+let ret = null, nm = null, ost = { tab: "stock" }, rs = null;
+
+/* ---------- saving on the iPad ---------- */
+try {
+  const r = localStorage.getItem(KEY);
+  if (r) { store = Object.assign(blank(), JSON.parse(r)); store.v = 3; store.draft = store.draft || { counted: {}, reason: {} }; store.draft.counted = store.draft.counted || {}; store.draft.reason = store.draft.reason || {}; }
+  localStorage.setItem(KEY + "-test", "1"); localStorage.removeItem(KEY + "-test");
+} catch (e) { canSave = false; }
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { canSave = false; } }
+function save() { persist(); syncSoon(); }   // every save also nudges the Sheet sync
+
+/* ---------- the menu: built-in, or the copy downloaded from the Sheet ---------- */
+const MENU_KEY = KEY + "-menu";
+const BUILTIN = { companyName: CONFIG.companyName, lines: CONFIG.lines, lowStock: CONFIG.lowStock, items: CONFIG.items };
+let menuInfo = { source: "built-in", version: null, fetchedAt: null };   // what is showing right now
+let menuCache = null;                                                   // newest copy from the Sheet {version, fetchedAt, menu}
+try { const m = localStorage.getItem(MENU_KEY); if (m) menuCache = JSON.parse(m); } catch (e) {}
+function menuProblem(m) {
+  if (!m || !Array.isArray(m.items) || !m.items.length) return "The Menu tab has no items.";
+  if (!m.items.some(i => i.on !== false)) return "Every item on the Menu tab is switched off.";
+  return null;
+}
+function applyMenu(c) {   // c = a menu cache object, or null for the built-in menu
+  const m = c && !menuProblem(c.menu) ? c.menu : BUILTIN;
+  CONFIG.companyName = m.companyName || BUILTIN.companyName;
+  CONFIG.lines = m.lines && Object.keys(m.lines).length ? m.lines : BUILTIN.lines;
+  CONFIG.lowStock = m.lowStock != null ? m.lowStock : BUILTIN.lowStock;
+  CONFIG.items = m.items;
+  buildMenu();
+  menuInfo = m === BUILTIN ? { source: "built-in", version: null, fetchedAt: null } : { source: "sheet", version: c.version, fetchedAt: c.fetchedAt };
+}
+const menuWaiting = () => !!(menuCache && !menuProblem(menuCache.menu) && menuCache.version !== menuInfo.version);
+applyMenu(menuCache);
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+function toast(m) { const t = $("#toast"); t.textContent = m; t.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => t.style.display = "none", 2600); }
+
+/* ---------- setup checks (shown on the sign-in screen) ---------- */
+function setupNotes() {
+  const n = [], seen = {};
+  USERS.forEach(u => { if (!/^\d{4}$/.test(u.pin)) n.push(u.name + ": PIN must be exactly 4 digits."); if (seen[u.pin]) n.push("PIN " + u.pin + " is used twice."); seen[u.pin] = 1; });
+  const skus = {};
+  ITEMS.forEach(i => {
+    if (skus[i.sku]) n.push("SKU " + i.sku + " is used twice."); skus[i.sku] = 1;
+    if (!CONFIG.lines[i.line]) n.push(i.sku + ": no matching line in 'lines'.");
+    (i.options || []).forEach(o => { const codes = {}; (o.values || []).forEach(v => {
+      if (!/^[A-Za-z0-9]+$/.test(v.code || "")) n.push(i.sku + " / " + o.label + ": code '" + v.code + "' must be letters and numbers only.");
+      if (codes[v.code]) n.push(i.sku + " / " + o.label + ": code " + v.code + " is used twice."); codes[v.code] = 1;
+      if (/\|/.test(v.name)) n.push(i.sku + ": names cannot contain the | symbol."); }); });
+    if (STOCK.filter(e => e.parent === i.sku).length > 40) n.push(i.sku + ": more than 40 combos. Consider fewer options.");
+  });
+  const ids = {};
+  [...CONFIG.returnReasons, ...CONFIG.countReasons.short, ...CONFIG.countReasons.extra].forEach(r => { if (ids[r.id]) n.push("Reason id '" + r.id + "' is used twice."); ids[r.id] = 1; });
+  return n;
+}
+
+/* ---------- stock (always figured out from the saved records) ---------- */
+const startOf = sku => store.start[sku] ? store.start[sku].qty : itemOf(sku).stock;
+function stockMap() {
+  const m = {};
+  STOCK.forEach(i => m[i.sku] = { start: startOf(i.sku), restock: 0, sold: 0, back: 0, damaged: 0, adj: 0, on: 0 });
+  store.restocks.forEach(r => { if (m[r.sku]) m[r.sku].restock += r.qty; });
+  store.sales.forEach(s => s.lines.forEach(l => { if (m[l.sku]) m[l.sku].sold += l.qty; }));
+  store.returns.forEach(r => { const x = m[r.sku]; if (!x) return; if (r.restocked) x.back += r.qty; else x.damaged += r.qty; });
+  store.counts.forEach(c => c.rows.forEach(w => { if (m[w.sku]) m[w.sku].adj += w.diff; }));
+  Object.values(m).forEach(x => x.on = x.start + x.restock - x.sold + x.back + x.adj);
+  return m;
+}
+const lowAt = i => i.low != null ? i.low : CONFIG.lowStock;
+const statusOf = (on, i) => on <= 0 ? "out" : on <= lowAt(i) ? "low" : "ok";
+const statusWord = s => ({ ok: "Good", low: "Running low", out: "Sold out" }[s]);
+/* Shown on the Stock and Count screens? Items switched off in the Sheet only show while they still have history or stock moves. */
+const isActive = (e, x) => { const moved = x.restock > 0 || x.sold > 0 || x.back > 0 || x.damaged > 0 || x.adj !== 0;
+  if (!onMenu(e)) return moved || !!store.start[e.sku]; return !e.isVariant || x.start > 0 || moved; };
+const activeStock = m => STOCK.filter(e => isActive(e, m[e.sku]));
+const groupsOf = list => ITEMS.map(i => ({ i, ents: list.filter(e => e.parent === i.sku) })).filter(g => g.ents.length);
+const grpHead = (g, m) => g.ents.length > 1 || g.ents[0].isVariant ? `<div class="grp">${esc(g.i.name)} <small>${esc(g.i.sku)} &middot; ${g.ents.length} combos &middot; ${g.ents.reduce((a, e) => a + Math.max(0, m[e.sku].on), 0)} on hand</small></div>` : "";
+function lowList(m) { return activeStock(m).map(i => ({ i, on: m[i.sku].on, s: statusOf(m[i.sku].on, i) })).filter(x => x.s !== "ok"); }
+
+/* ---------- picture tiles (drawn, no image files) ---------- */
+function artShape(a) {
+  if (a === "star") return '<polygon points="46,32.5 48,37.75 53.6,38 49.2,41.5 50.7,47 46,43.9 41.3,47 42.8,41.5 38.4,38 44,37.75" fill="#fff" opacity=".92"/>';
+  if (a === "flower") return '<g fill="#fff" opacity=".95"><circle cx="50" cy="40" r="3"/><circle cx="47.2" cy="43.8" r="3"/><circle cx="42.8" cy="42.4" r="3"/><circle cx="42.8" cy="37.6" r="3"/><circle cx="47.2" cy="36.2" r="3"/></g><circle cx="46" cy="40" r="2" fill="#E9C46A"/>';
+  if (a === "swirl") return '<path d="M46 40c2-3 6-2 6 1s-5 5-8 2-1-8 4-8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>';
+  return '<path d="M46 44c-9-6-11-11-5-12 3 0 5 2 5 4 0-2 2-4 5-4 6 1 4 6-5 12z" fill="#fff" opacity=".9"/>';
+}
+function icon(kind, c, art) {
+  const steam = '<path d="M34 22c-5-6 5-9 0-15M50 22c-5-6 5-9 0-15" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".8"/>';
+  if (kind === "mug") return `<svg viewBox="0 0 100 100">${steam}<ellipse cx="46" cy="92" rx="36" ry="5" fill="rgba(0,0,0,.12)"/><path d="M76 46h7a11 11 0 0 1 0 24h-9" fill="none" stroke="#fff" stroke-width="7"/><path d="M14 40h64v26a22 22 0 0 1-22 22H36a22 22 0 0 1-22-22z" fill="#fff" stroke="#E2D3BC" stroke-width="2"/><ellipse cx="46" cy="40" rx="32" ry="8" fill="${c}"/>${artShape(art)}</svg>`;
+  if (kind === "iced") return `<svg viewBox="0 0 100 100"><path d="M60 4l-6 30" stroke="${c}" stroke-width="6" stroke-linecap="round"/><rect x="20" y="26" width="60" height="9" rx="4" fill="#fff"/><path d="M24 35h52l-6 56H30z" fill="${c}" fill-opacity=".55" stroke="${c}" stroke-width="3"/><rect x="34" y="48" width="16" height="16" rx="3" fill="#fff" opacity=".7" transform="rotate(-12 42 56)"/><rect x="52" y="64" width="16" height="16" rx="3" fill="#fff" opacity=".7" transform="rotate(10 60 72)"/></svg>`;
+  if (kind === "cookie") return `<svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="38" fill="${c}" stroke="#A8743A" stroke-width="3"/><g fill="#5A3523"><circle cx="38" cy="40" r="5"/><circle cx="62" cy="36" r="4.5"/><circle cx="55" cy="58" r="5.5"/><circle cx="32" cy="62" r="4.5"/><circle cx="68" cy="66" r="4"/></g></svg>`;
+  if (kind === "muffin") return `<svg viewBox="0 0 100 100"><path d="M22 52h56l-7 38H29z" fill="#fff" stroke="#E2D3BC" stroke-width="2"/><path d="M38 52l3 38M50 52v38M62 52l-3 38" stroke="#E2D3BC" stroke-width="2"/><path d="M14 54c-4-26 18-40 36-40s40 14 36 40z" fill="${c}" stroke="#B9843E" stroke-width="3"/><circle cx="38" cy="34" r="3.5" fill="#8A5A2B"/><circle cx="60" cy="28" r="3.5" fill="#8A5A2B"/><circle cx="68" cy="42" r="3.5" fill="#8A5A2B"/></svg>`;
+  return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="${c}"/></svg>`;
+}
+const tint = line => `var(--tint-${/^[A-Za-z0-9_-]+$/.test(line) ? line : "other"},var(--tint-other))`;
+const mini = i => `<span class="mini" style="background:${tint(i.line)}">${icon(i.icon, i.color, i.art)}</span>`;
+
+/* ---------- sign in ---------- */
+function showLogin() {
+  user = null; pin = ""; cart = {}; tab = "ALL"; ret = null; ost = { tab: "stock" }; rs = null;
+  if (menuWaiting()) applyMenu(menuCache);   // a new menu from the Sheet takes effect at sign-in
+  const notes = setupNotes();
+  $("#app").innerHTML = `<div class="login">${logo("big")}<h1>${esc(CONFIG.companyName)}</h1><p>${esc(CONFIG.tagline)}</p>
+  <div class="dots" id="dots"></div><div class="msg" id="pinmsg"></div>
+  <div class="pad">${[1,2,3,4,5,6,7,8,9].map(d => `<button data-act="key" data-d="${d}">${d}</button>`).join("")}
+  <button data-act="pclear" aria-label="Clear">C</button><button data-act="key" data-d="0">0</button><button data-act="pback" aria-label="Back">&#9003;</button></div>
+  ${canSave ? "" : '<div class="setup">Saving is off on this browser, so sales will be lost when the page closes.</div>'}
+  ${notes.length ? '<div class="setup"><b>Setup notes for the SVP of Printing:</b><br>' + notes.map(esc).join("<br>") + "</div>" : ""}</div>`;
+  dots();
+}
+function dots() { $("#dots").innerHTML = [0,1,2,3].map(i => `<i class="${i < pin.length ? "on" : ""}"></i>`).join(""); }
+function tryPin() {
+  const u = USERS.find(x => x.pin === pin);
+  if (u) { user = u; showRegister(); return; }
+  $("#pinmsg").textContent = "That PIN did not work. Try again!";
+  const d = $("#dots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake");
+  pin = ""; setTimeout(dots, 350);
+}
+const isMgr = () => user && user.role === "manager";
+
+/* ---------- register ---------- */
+function showRegister() {
+  closeModal();
+  $("#app").innerHTML = `<div class="reg"><header>${logo("hdr")}<h2>${esc(CONFIG.companyName)}</h2><span class="who">${esc(user.name)} &middot; ${esc(user.title)}</span><span id="syncchip"></span>
+  <button class="hbtn sun" data-act="return">Return</button>
+  ${isMgr() ? '<button class="hbtn" data-act="office">Back office</button>' : '<button class="hbtn" data-act="sales">My sales</button>'}
+  <button class="hbtn" data-act="lock">Lock</button></header>
+  <section class="shop">${canSave ? "" : '<div class="warn">Saving is off in this browser. Sales will be lost when the page closes.</div>'}<div id="lowbar"></div><div class="tabs" id="tabs"></div><div class="grid" id="grid"></div></section>
+  <aside class="cart"><h3>Order</h3><div class="lines" id="lines"></div><div class="foot" id="foot"></div></aside></div>`;
+  drawTabs(); drawCart(); drawChip();
+}
+function drawTabs() {
+  const t = [["ALL", "All"], ...Object.entries(CONFIG.lines)];
+  $("#tabs").innerHTML = t.map(([k, v]) => `<button class="${k === tab ? "on" : ""}" data-act="tab" data-k="${esc(k)}">${esc(v)}</button>`).join("");
+}
+const cartQty = sku => Object.entries(cart).reduce((s, [k, q]) => s + (parseKey(k).sku === sku ? q : 0), 0);   // one stock SKU
+const cartQtyParent = sku => Object.entries(cart).reduce((s, [k, q]) => s + (itemOf(parseKey(k).sku).parent === sku ? q : 0), 0);   // whole menu item
+function tileStock(i, m) { return STOCK.filter(x => x.parent === i.sku && isActive(x, m[x.sku])).reduce((a, x) => a + m[x.sku].on, 0); }
+function drawGrid() {
+  const m = stockMap();
+  $("#grid").innerHTML = ITEMS.filter(i => onMenu(i) && (tab === "ALL" || i.line === tab)).map(i => {
+    const on = tileStock(i, m), s = statusOf(on, i), q = cartQtyParent(i.sku);
+    const chip = s === "out" ? "Sold out" : s === "low" ? "Only " + on + " left" : on + " left";
+    return `<button class="tile" data-act="add" data-sku="${esc(i.sku)}">
+  ${q ? `<span class="qty">${q}</span>` : ""}<span class="stk ${s}">${chip}</span><div class="pic" style="background:${tint(i.line)}">${icon(i.icon, i.color)}</div><b>${esc(i.name)}</b><span class="price">${sticks(i.price)}</span><small>${esc(i.sku)}${i.options && i.options.length ? " &middot; pick options" : ""}</small></button>`;
+  }).join("");
+  const lb = $("#lowbar");
+  if (lb) {
+    const l = isMgr() ? lowList(m) : [];
+    lb.innerHTML = l.length ? `<div class="warn low">Stock check: ${l.slice(0, 6).map(x => esc(dispName(x.i)) + " (" + (x.on <= 0 ? "sold out" : x.on + " left") + ")").join(", ")}${l.length > 6 ? " and " + (l.length - 6) + " more" : ""}</div>` : "";
+  }
+}
+const total = () => Object.entries(cart).reduce((s, [k, q]) => s + q * itemOf(parseKey(k).sku).price, 0);
+function drawCart() {
+  const e = Object.entries(cart), m = stockMap();
+  $("#lines").innerHTML = e.length ? e.map(([k, q]) => {
+    const p = parseKey(k), i = itemOf(p.sku), have = m[p.sku] ? m[p.sku].on : 0, inCart = cartQty(p.sku);
+    const over = inCart > have ? `<small class="over">Stock says only ${Math.max(have, 0)} left. Check the shelf!</small>` : "";
+    return `<div class="line"><div class="n">${esc(dispName(i))}${p.flavor ? " &middot; " + esc(p.flavor) : ""}<small>${esc(i.sku)}</small>${over}</div><div class="t">${sticks(q * i.price)}</div>
+   <div class="step"><button data-act="dec" data-k="${esc(k)}">&minus;</button><span>${q}</span><button data-act="inc" data-k="${esc(k)}">+</button></div></div>`;
+  }).join("") : '<div class="empty">Tap a treat to start an order!</div>';
+  $("#foot").innerHTML = `<div class="total"><span>Total</span><b>${sticks(total())}</b></div><button class="big" data-act="charge" ${e.length ? "" : "disabled"}>Charge</button>${e.length ? '<button class="link" data-act="clearcart">Clear order</button>' : ""}`;
+  drawGrid();
+}
+function addToCart(k) { cart[k] = Math.min(99, (cart[k] || 0) + 1); drawCart(); }
+const optItem = sku => ITEMS.find(i => i.sku === sku);
+let pk = null;
+function openPicker(sku) { pk = { item: optItem(sku), picks: [] }; drawPicker(); }
+function drawPicker() {
+  const it = pk.item, step = pk.picks.length, o = it.options[step], m = stockMap(), perCombo = it.trackStock !== "item";
+  const pc = pk.picks.map(v => v.code), mine = STOCK.filter(e => e.parent === it.sku && e.isVariant), anyActive = mine.some(e => isActive(e, m[e.sku]));
+  const col = (pk.picks.find(v => v.color) || {}).color || it.color, art = (pk.picks.find(v => v.art) || {}).art;
+  const vals = o.values.map(v => {
+    if (!perCombo) return { v, n: null };
+    const ents = mine.filter(e => [...pc, v.code].every((c, i) => e.codes[i] === c) && (!anyActive || isActive(e, m[e.sku])));
+    return { v, none: !ents.length, n: ents.reduce((a, e) => a + Math.max(0, m[e.sku].on), 0) };
+  }).filter(x => !x.none);
+  openModal(`<h3>${esc(it.name)}</h3><div style="width:110px;height:110px;margin:0 auto">${icon(it.icon, col, art)}</div>
+  <p class="hint">${pk.picks.length ? esc(pk.picks.map(v => v.name).join(" \u00b7 ")) + " \u00b7 " : ""}Step ${step + 1} of ${it.options.length}</p><p><b>${esc(o.label)}</b></p>
+  <div class="rgrid">${vals.map(x => `<button class="rsn" data-act="pickv" data-i="${o.values.indexOf(x.v)}">${x.v.art ? `<span class="bi">${icon(it.icon, col, x.v.art)}</span>` : x.v.color ? `<span style="display:inline-block;width:26px;height:26px;border-radius:50%;background:${esc(x.v.color)};border:3px solid var(--ink);vertical-align:-5px;margin-right:8px"></span>` : ""}${esc(x.v.name)}${x.n == null ? "" : `<small class="${x.n ? "" : "gone"}">${x.n ? x.n + " left" : "Sold out"}</small>`}</button>`).join("")}</div>
+  <div class="row"><button class="btn" data-act="pback2">${step ? "Back" : "Cancel"}</button></div>`);
+}
+function pickValue(i) {
+  const it = pk.item; pk.picks.push(it.options[pk.picks.length].values[i]);
+  if (pk.picks.length < it.options.length) { drawPicker(); return; }
+  const p = pk.picks, key = it.trackStock !== "item" ? it.sku + "-" + p.map(v => v.code).join("-") : it.sku + "|" + p.map(v => v.name).join(" / ");
+  pk = null; closeModal(); addToCart(key);
+}
+
+/* ---------- payment ---------- */
+function openModal(h, wide) { $("#modal").innerHTML = '<div class="card' + (wide ? " wide" : "") + '">' + h + "</div>"; $("#modal").classList.add("show"); }
+function closeModal() { $("#modal").classList.remove("show"); $("#modal").innerHTML = ""; }
+function ask(msg, yes, fn) { pending = fn; openModal(`<h3>${esc(msg)}</h3><div class="row"><button class="btn" data-act="close">Go back</button><button class="btn bad" data-act="yes">${esc(yes)}</button></div>`); }
+function payScreen() {
+  const t = total(), g = parseInt(tender || "0", 10), ok = g >= t;
+  const quick = [5, 10, 20].filter(n => n > t);
+  openModal(`<h3>Payment</h3><p>Total: <b>${sticks(t)}</b></p><div class="bigmoney">${sticks(g)}</div><p>${ok ? "Change to give back: <b>" + sticks(g - t) + "</b>" : "Customer gives sticks..."}</p>
+  <div class="quick"><button class="btn sun" data-act="exact">Exact</button>${quick.slice(0, 3).map(n => `<button class="btn" data-act="setpay" data-n="${n}">${n}</button>`).join("")}</div>
+  <div class="npad">${[1,2,3,4,5,6,7,8,9].map(d => `<button data-act="pkey" data-d="${d}">${d}</button>`).join("")}<button data-act="pclr">C</button><button data-act="pkey" data-d="0">0</button><button data-act="pbk">&#9003;</button></div>
+  <div class="row"><button class="btn" data-act="close">Back</button><button class="btn go" data-act="done" ${ok ? "" : "disabled"}>Complete sale</button></div>`);
+}
+function completeSale() {
+  const t = total(), g = parseInt(tender, 10), now = new Date();
+  const lines = Object.entries(cart).map(([k, q]) => { const p = parseKey(k); const l = { sku: p.sku, label: dispName(itemOf(p.sku)), qty: q, sticks: itemOf(p.sku).price }; if (p.flavor) l.flavor = p.flavor; return l; });
+  const sale = { id: "S" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), no: store.next++, time: now.toISOString(), date: localDate(now), device: store.device, cashier: user.name, lines, total: t, paid: g, change: g - t };
+  store.sales.push(sale); save(); cart = {}; tender = ""; drawCart();
+  const n = sale.change;
+  openModal(`<h3>Sale #${sale.no} done!</h3><p>Give back</p><div class="bigmoney">${sticks(n)}</div>
+  <div class="sticks">${n <= 15 ? '<i class="stick"></i>'.repeat(n) : ""}</div><p>Thank you for visiting ${esc(CONFIG.companyName)}!</p><p class="hint">Write sale #${sale.no} on the receipt if the customer wants one.</p>
+  <div class="row"><button class="btn go" data-act="close">Next customer</button></div>`);
+}
+
+/* ---------- returns ---------- */
+const returnedFor = (saleId, k) => store.returns.filter(r => r.saleId === saleId && keyOf(r) === k).reduce((s, r) => s + r.qty, 0);
+const saleReturns = () => { const m = {}; store.returns.forEach(r => { if (r.saleId) { const x = m[r.saleId] = m[r.saleId] || { qty: 0, sticks: 0 }; x.qty += r.qty; x.sticks += r.sticks; } }); return m; };
+function startReturn() { ret = { step: "find", sale: null, picks: {}, reason: null, num: "", err: "", done: null }; drawReturn(); }
+const retLines = () => ret.sale
+  ? ret.sale.lines.map(l => ({ k: keyOf(l), unit: l.sticks, max: l.qty - returnedFor(ret.sale.id, keyOf(l)), bought: l.qty, did: returnedFor(ret.sale.id, keyOf(l)) }))
+  : activeStock(stockMap()).map(e => ({ k: e.sku, unit: e.price, max: 20, bought: null, did: 0 }));
+const refundTotal = () => retLines().reduce((s, l) => s + (ret.picks[l.k] || 0) * l.unit, 0);
+function drawReturn() {
+  const s = ret.step;
+  if (s === "find") {
+    const recent = store.sales.slice().reverse().slice(0, 8);
+    openModal(`<h3>Return</h3><p>Which sale is it from?</p><div class="sales">${recent.map(x => `<button class="salebtn" data-act="rsale" data-id="${esc(x.id)}"><b>Sale #${x.no} &middot; ${sticks(x.total)}</b><small>${fmtTime(x.time)} &middot; ${x.lines.map(l => l.qty + " x " + esc(dispName(itemOf(l.sku))) + (l.flavor ? " (" + esc(l.flavor) + ")" : "")).join(", ")}</small></button>`).join("") || "<p>No sales yet.</p>"}</div>
+    <div class="row"><button class="btn" data-act="rnum">Type a sale number</button><button class="btn" data-act="rnosale">No sale number</button></div>
+    <div class="row"><button class="btn" data-act="rcancel">Cancel</button></div>`, true);
+  } else if (s === "num") {
+    openModal(`<h3>Sale number</h3><div class="bigmoney">${ret.num ? "#" + ret.num : "#?"}</div><div class="err">${esc(ret.err)}</div>
+    <div class="npad">${[1,2,3,4,5,6,7,8,9].map(d => `<button data-act="rkey" data-d="${d}">${d}</button>`).join("")}<button data-act="rclr">C</button><button data-act="rkey" data-d="0">0</button><button data-act="rbk">&#9003;</button></div>
+    <div class="row"><button class="btn" data-act="rback">Back</button><button class="btn go" data-act="rgo" ${ret.num ? "" : "disabled"}>Find it</button></div>`);
+  } else if (s === "items") {
+    const L = retLines(), any = Object.values(ret.picks).some(q => q > 0);
+    const rows = L.map(l => {
+      const q = ret.picks[l.k] || 0;
+      const sub = ret.sale ? `Bought ${l.bought}${l.did ? " &middot; already returned " + l.did : ""} &middot; ${sticks(l.unit)} each` : `${sticks(l.unit)} each`;
+      return `<div class="rline"><div><b>${esc(lineName(l.k))}</b><small>${esc(parseKey(l.k).sku)} &middot; ${sub}</small></div>
+      ${l.max > 0 ? `<div class="mstep"><button data-act="rdec" data-k="${esc(l.k)}" ${q ? "" : "disabled"}>&minus;</button><span>${q}</span><button data-act="rinc" data-k="${esc(l.k)}" ${q >= l.max ? "disabled" : ""}>+</button></div>` : "<small>All returned</small>"}</div>`;
+    }).join("");
+    openModal(`<h3>${ret.sale ? "Sale #" + ret.sale.no + ": what is coming back?" : "What is coming back?"}</h3>${ret.sale ? "" : '<p class="hint">No sale number. Pick the items. They are refunded at today\'s price.</p>'}
+    <div class="sales">${rows}</div><p>Refund so far: <b>${sticks(refundTotal())}</b></p>
+    <div class="row"><button class="btn" data-act="rback">Back</button><button class="btn go" data-act="rnext" ${any ? "" : "disabled"}>Next</button></div>`, true);
+  } else if (s === "reason") {
+    const L = retLines().filter(l => (ret.picks[l.k] || 0) > 0);
+    openModal(`<h3>Why is it coming back?</h3><p>${L.map(l => ret.picks[l.k] + " x " + esc(lineName(l.k))).join(", ")}</p><p>Refund: <b>${sticks(refundTotal())}</b></p>
+    <div class="rgrid">${CONFIG.returnReasons.map(r => `<button class="rsn ${ret.reason === r.id ? "on" : ""} ${r.restock ? "" : "noback"}" data-act="rreason" data-id="${esc(r.id)}">${esc(r.label)}<small>${r.restock ? "Goes back on the shelf" : "Does not go back on the shelf"}</small></button>`).join("")}</div>
+    <div class="row"><button class="btn" data-act="rback">Back</button><button class="btn go" data-act="rdone" ${ret.reason ? "" : "disabled"}>Give refund</button></div>`, true);
+  } else if (s === "done") {
+    const d = ret.done, n = d.tot;
+    openModal(`<h3>Return #${d.no} done!</h3><p>Give back</p><div class="bigmoney">${sticks(n)}</div><div class="sticks">${n <= 15 ? '<i class="stick"></i>'.repeat(n) : ""}</div>
+    <p>${d.restock ? "The item goes back on the shelf." : "The item does not go back on the shelf. Put it in the damaged box."}</p>
+    <div class="row"><button class="btn go" data-act="rfinish">Next customer</button></div>`);
+  }
+}
+function finishReturn() {
+  const reason = CONFIG.returnReasons.find(r => r.id === ret.reason), no = store.nextRet++, now = new Date();
+  let tot = 0;
+  retLines().forEach(l => {
+    const q = ret.picks[l.k] || 0; if (q <= 0) return;
+    const p = parseKey(l.k), st = q * l.unit; tot += st;
+    store.returns.push({ id: uid("R"), no, time: now.toISOString(), date: localDate(now), device: store.device, cashier: user.name,
+      saleId: ret.sale ? ret.sale.id : null, saleNo: ret.sale ? ret.sale.no : null, sku: p.sku, label: lineName(l.k), flavor: p.flavor, qty: q, unit: l.unit, sticks: st, reason: reason.id, restocked: reason.restock });
+  });
+  save();
+  ret.done = { no, tot, restock: reason.restock }; ret.step = "done"; drawReturn();
+  if ($("#grid")) drawCart();
+}
+
+/* ---------- number pad popup (used for counting and starting stock) ---------- */
+function numModal(title, sub, start, cb) { nm = { title, sub, v: start == null ? "" : String(start), cb, fresh: start != null }; drawNum(); }
+function drawNum() {
+  openModal(`<h3>${esc(nm.title)}</h3><p>${esc(nm.sub || "")}</p><div class="bigmoney">${nm.v === "" ? "?" : nm.v}</div>
+  <div class="npad">${[1,2,3,4,5,6,7,8,9].map(d => `<button data-act="nkey" data-d="${d}">${d}</button>`).join("")}<button data-act="nclr">C</button><button data-act="nkey" data-d="0">0</button><button data-act="nbk">&#9003;</button></div>
+  <div class="row"><button class="btn" data-act="nclose">Cancel</button><button class="btn go" data-act="nok" ${nm.v === "" ? "disabled" : ""}>OK</button></div>`);
+}
+
+/* ---------- cashier: my sales ---------- */
+function salesSheet() {
+  const mine = store.sales.filter(s => s.cashier === user.name), myRet = store.returns.filter(r => r.cashier === user.name);
+  const sum = mine.reduce((a, s) => a + s.total, 0), back = myRet.reduce((a, r) => a + r.sticks, 0), sr = saleReturns();
+  openModal(`<h3>My sales</h3><p>${mine.length} sales &middot; ${sticks(sum)}</p><p>${new Set(myRet.map(r => r.no + r.cashier)).size} returns &middot; ${sticks(back)} refunded</p><div class="sales">${salesRows(mine.slice().reverse().slice(0, 40), sr) || "<p>No sales yet.</p>"}</div>
+  <div class="row"><button class="btn go" data-act="close">Close</button></div>`);
+}
+function salesRows(list, sr) {
+  return list.map(s => `<div class="sale"><b>#${s.no} &middot; ${sticks(s.total)}</b>${sr[s.id] ? `<span class="tag">${sr[s.id].qty} returned</span>` : ""}<small>${fmtTime(s.time)} &middot; ${esc(s.cashier)} &middot; ${s.lines.map(l => l.qty + " x " + esc(l.sku) + (l.flavor ? " (" + esc(l.flavor) + ")" : "")).join(", ")}</small></div>`).join("");
+}
+
+/* ============================================================
+   BACK OFFICE (manager only)
+   ============================================================ */
+const OTABS = [["stock", "Stock"], ["restock", "Restock"], ["count", "Count"], ["shrink", "Shrinkage"], ["returns", "Returns"], ["sales", "Sales"], ["menu", "Menu"], ["sync", "Sheet sync"], ["backup", "Backup"]];
+function showOffice(t) { ost.tab = t || ost.tab || "stock"; closeModal(); renderOffice(); }
+function renderOffice() {
+  const sc = $("#omain") ? $("#omain").scrollTop : 0;
+  $("#app").innerHTML = `<div class="office"><header>${logo("hdr")}<h2>${esc(CONFIG.companyName)} &middot; Back office</h2><span class="who">${esc(user.name)} &middot; ${esc(user.title)}</span><span id="syncchip"></span>
+  <button class="hbtn sun" data-act="backup">Download backup</button><button class="hbtn" data-act="toreg">Register</button><button class="hbtn" data-act="lock">Lock</button></header>
+  <nav class="otabs">${OTABS.map(([k, v]) => `<button class="${k === ost.tab ? "on" : ""}" data-act="otab" data-k="${k}">${v}</button>`).join("")}</nav><main id="omain">${officeBody()}</main></div>`;
+  $("#omain").scrollTop = sc; drawChip();
+}
+function officeBody() { return ({ stock: tStock, restock: tRestock, count: tCount, shrink: tShrink, returns: tReturns, sales: tSales, menu: tMenu, sync: tSync, backup: tBackup }[ost.tab])(); }
+
+/* ---- Stock ---- */
+function tStock() {
+  const m = stockMap(), act = activeStock(m), low = lowList(m);
+  const row = e => { const x = m[e.sku], s = statusOf(x.on, e);
+    return `<div class="trow"><div class="nm">${mini(e)}<div>${esc(entName(e))}<small>${esc(e.sku)}</small></div></div>
+    <div><button class="cellbtn" data-act="editstart" data-sku="${esc(e.sku)}">${x.start}</button></div><div>${x.restock}</div><div>${x.sold}</div><div>${x.back}</div><div class="${x.adj < 0 ? "neg" : ""}">${x.adj > 0 ? "+" : ""}${x.adj}</div>
+    <div class="on ${x.on < 0 ? "neg" : ""}">${x.on}</div><div><span class="chip ${s}">${statusWord(s)}</span></div></div>`; };
+  const rows = groupsOf(act).map(g => grpHead(g, m) + g.ents.map(row).join("")).join("");
+  const dmg = act.reduce((a, e) => a + m[e.sku].damaged, 0);
+  return `<div class="panel"><h3>Stock on hand</h3>
+  <div class="stats"><div class="stat"><b>${act.reduce((a, e) => a + Math.max(0, m[e.sku].on), 0)}</b><span>pieces on hand</span></div><div class="stat"><b>${low.filter(x => x.s === "low").length}</b><span>running low</span></div><div class="stat"><b>${low.filter(x => x.s === "out").length}</b><span>sold out</span></div><div class="stat"><b>${dmg}</b><span>damaged returns</span></div></div>
+  <p class="hint">On hand = Start + Restocked &minus; Sold + Returned to shelf &plusmn; Count fixes. Tap a Start number to change it. "Low" means ${CONFIG.lowStock} or fewer (unless an item has its own setting). Combos you have not made yet are hidden until you Restock them.</p></div>
+  <div class="panel scroll"><div class="tbl"><div class="trow head"><div style="text-align:left">Item</div><div>Start</div><div>Restocked</div><div>Sold</div><div>Returned</div><div>Count fixes</div><div>On hand</div><div>Status</div></div>${rows}</div></div>`;
+}
+
+/* ---- Restock ---- */
+function tRestock() {
+  if (!rs) rs = { date: localDate(), qty: {} };
+  const m = stockMap(), n = Object.values(rs.qty).reduce((a, b) => a + b, 0);
+  const row = e => { const q = rs.qty[e.sku] || 0, isNew = e.isVariant && !isActive(e, m[e.sku]);
+    return `<div class="rsrow"><div class="nm">${mini(e)}<div>${esc(entName(e))}<small>${esc(e.sku)} &middot; ${isNew ? "not made yet" : m[e.sku].on + " on hand"}</small></div></div><div></div>
+    <div class="mstep"><button data-act="rsdec" data-sku="${esc(e.sku)}" ${q ? "" : "disabled"}>&minus;</button><span>${q}</span><button data-act="rsinc" data-sku="${esc(e.sku)}" data-n="1">+</button><button class="plus5" data-act="rsinc" data-sku="${esc(e.sku)}" data-n="5">+5</button></div></div>`; };
+  const rows = groupsOf(STOCK.filter(onMenu)).map(g => grpHead(g, m) + g.ents.map(row).join("")).join("");
+  const hist = store.restocks.slice().reverse().slice(0, 24).map(r => `<div class="rec"><b>${r.qty} x ${esc(dispName(itemOf(r.sku)))}</b> <small>Printed ${fmtDateKey(r.date)} &middot; logged ${fmtTime(r.time)} by ${esc(r.by)} &middot; ${esc(r.sku)}</small></div>`).join("");
+  return `<div class="panel"><h3>Restock: count the new pieces</h3><p class="hint">Count the pieces that came off the printer, then add them to stock. Pick the day they were printed. A new combo shows up on the register as soon as you restock it.</p>
+  <p><label>Printed on: <input class="datein" type="date" id="rsdate" value="${esc(rs.date)}"></label></p>${rows}
+  <div class="bar"><button class="btn" data-act="rsclear" ${n ? "" : "disabled"}>Clear</button><button class="btn go" data-act="rssave" ${n ? "" : "disabled"}>Save restock${n ? " (" + n + " pieces)" : ""}</button></div></div>
+  <div class="panel"><h3>Recent restocks</h3>${hist || "<p>No restocks yet.</p>"}</div>`;
+}
+
+/* ---- End-of-day count ---- */
+function countRows() {
+  const m = stockMap(), d = store.draft;
+  return activeStock(m).map(i => { const exp = m[i.sku].on, has = d.counted[i.sku] != null, c = d.counted[i.sku], diff = has ? c - exp : null; return { i, exp, has, c, diff, reason: d.reason[i.sku] || null }; });
+}
+function countReady(R) { const done = R.filter(r => r.has); return done.length > 0 && done.every(r => r.diff === 0 || r.reason); }
+function tCount() {
+  const R = countRows(), m = stockMap(), bySku = {}; R.forEach(r => bySku[r.i.sku] = r);
+  const one = r => {
+    const chip = !r.has ? "" : r.diff === 0 ? '<span class="chip ok">Matches!</span>' : r.diff < 0 ? `<span class="chip bad">${-r.diff} short</span>` : `<span class="chip low">${r.diff} extra</span>`;
+    const opts = r.has && r.diff !== 0 ? (r.diff < 0 ? CONFIG.countReasons.short : CONFIG.countReasons.extra) : null;
+    return `<div class="crow"><div class="nm">${mini(r.i)}<div>${esc(entName(r.i))}<small>${esc(r.i.sku)}</small></div></div><div><small style="opacity:.6;font-size:13px;display:block">Expected</small><b>${r.exp}</b></div>
+    <div><button class="cellbtn" data-act="cnum" data-sku="${esc(r.i.sku)}">${r.has ? r.c : "Count"}</button></div><div>${chip}</div>
+    ${opts ? `<div class="reasons"><span style="align-self:center;font-weight:800">Why?</span>${opts.map(o => `<button class="rbtn ${r.reason === o.id ? "on" : ""}" data-act="creason" data-sku="${esc(r.i.sku)}" data-id="${esc(o.id)}">${esc(o.label)}</button>`).join("")}</div>` : ""}</div>`;
+  };
+  const rows = groupsOf(R.map(r => r.i)).map(g => grpHead(g, m) + g.ents.map(e => one(bySku[e.sku])).join("")).join("");
+  const nDone = R.filter(r => r.has).length, missing = R.filter(r => r.has && r.diff !== 0 && !r.reason).length;
+  return `<div class="panel"><h3>End-of-day count</h3><p class="hint">Count what is really on the shelf, tap Count, and type the number. The register shows how far off it is. If something is missing, pick why. Saving sets stock to what you counted.</p>
+  <p><button class="btn" data-act="callmatch" ${R.some(r => !r.has) ? "" : "disabled"}>Everything not counted yet matches</button></p>${rows}
+  ${nDone && missing ? `<p class="err">Pick a reason for ${missing} item${missing === 1 ? "" : "s"} that ${missing === 1 ? "does" : "do"} not match.</p>` : ""}
+  <div class="bar"><button class="btn" data-act="cclear" ${nDone ? "" : "disabled"}>Start over</button><button class="btn go" data-act="csave" ${countReady(R) ? "" : "disabled"}>Save count (${nDone} of ${R.length})</button></div></div>`;
+}
+function saveCount() {
+  const R = countRows().filter(r => r.has), now = new Date();
+  store.counts.push({ id: uid("C"), no: store.nextCount++, time: now.toISOString(), date: localDate(now), device: store.device, by: user.name,
+    rows: R.map(r => ({ sku: r.i.sku, expected: r.exp, counted: r.c, diff: r.diff, reason: r.diff === 0 ? null : r.reason })) });
+  store.draft = { counted: {}, reason: {} }; save();
+  ost.tab = "shrink"; closeModal(); renderOffice(); toast("Count saved!");
+}
+
+/* ---- Shrinkage ---- */
+function shrinkData() {
+  const by = {}, sku = {}; let extra = 0;
+  const add = (id, label, s, q) => { by[id] = by[id] || { label, q: 0 }; by[id].q += q; const k = sku[s] = sku[s] || { q: 0, parts: {} }; k.q += q; k.parts[label] = (k.parts[label] || 0) + q; };
+  store.returns.filter(r => !r.restocked).forEach(r => add("damaged-return", "Damaged returns", r.sku, r.qty));
+  store.counts.forEach(c => c.rows.forEach(w => { if (w.diff < 0) add(w.reason || "lost", reasonLabel(w.reason || "lost"), w.sku, -w.diff); else if (w.diff > 0) extra += w.diff; }));
+  return { by, sku, extra, units: Object.values(by).reduce((a, b) => a + b.q, 0), worth: Object.entries(sku).reduce((a, [s, v]) => a + v.q * itemOf(s).price, 0) };
+}
+function tShrink() {
+  const d = shrinkData();
+  const cards = Object.values(d.by).sort((a, b) => b.q - a.q).map(b => `<div class="stat"><b>${b.q}</b><span>${esc(b.label)}</span></div>`).join("");
+  const rows = Object.entries(d.sku).sort((a, b) => b[1].q - a[1].q).map(([s, v]) => `<div class="rec"><b>${esc(dispName(itemOf(s)))}</b> &middot; ${v.q} lost (${sticks(v.q * itemOf(s).price)} of sales)<small>${esc(s)} &middot; ${Object.entries(v.parts).map(([k, q]) => esc(k) + " " + q).join(", ")}</small></div>`).join("");
+  const hist = store.counts.slice().reverse().map(c => { const sh = c.rows.filter(r => r.diff < 0).reduce((a, r) => a + -r.diff, 0), ex = c.rows.filter(r => r.diff > 0).reduce((a, r) => a + r.diff, 0);
+    return `<div class="rec"><b>Count #${c.no}</b> <small>${fmtDateKey(c.date)} at ${fmtTime(c.time)} by ${esc(c.by)} &middot; ${c.rows.length} items &middot; ${sh} short, ${ex} extra</small></div>`; }).join("");
+  return `<div class="panel"><h3>Shrinkage: where did pieces go?</h3>
+  <div class="stats"><div class="stat"><b>${d.units}</b><span>pieces lost</span></div><div class="stat"><b>${d.worth}</b><span>${CONFIG.unit[1]} of sales lost</span></div><div class="stat"><b>${d.extra}</b><span>found extra</span></div></div>
+  <p class="hint">Shrinkage is stock that disappeared without a sale: damaged returns plus anything missing at the end-of-day count.</p>
+  ${cards ? `<div class="stats">${cards}</div>` : "<p>No shrinkage yet. Nice!</p>"}</div>
+  ${rows ? `<div class="panel"><h3>By item</h3>${rows}</div>` : ""}<div class="panel"><h3>Count history</h3>${hist || "<p>No counts saved yet.</p>"}</div>`;
+}
+
+/* ---- Returns log ---- */
+function tReturns() {
+  const R = store.returns.slice().reverse(), ref = R.reduce((a, r) => a + r.sticks, 0), nos = new Set(R.map(r => r.no)).size;
+  const rows = R.slice(0, 200).map(r => `<div class="rec"><b>Return #${r.no} &middot; ${r.qty} x ${esc(dispName(itemOf(r.sku)))}${r.flavor ? " (" + esc(r.flavor) + ")" : ""}</b> <span class="chip ${r.restocked ? "" : "bad"}">${esc(reasonLabel(r.reason))}</span>
+  <small>${fmtDay(r.time)} ${fmtTime(r.time)} &middot; ${esc(r.cashier)} &middot; ${esc(r.sku)} &middot; ${sticks(r.sticks)} refunded &middot; ${r.saleNo ? "from sale #" + r.saleNo : "no sale number"} &middot; ${r.restocked ? "back on shelf" : "NOT restocked (shrinkage)"}</small></div>`).join("");
+  return `<div class="panel"><h3>Return log</h3><div class="stats"><div class="stat"><b>${nos}</b><span>returns</span></div><div class="stat"><b>${ref}</b><span>${CONFIG.unit[1]} refunded</span></div><div class="stat"><b>${R.filter(r => !r.restocked).reduce((a, r) => a + r.qty, 0)}</b><span>pieces damaged</span></div></div>
+  ${rows || "<p>No returns yet.</p>"}${R.length > 200 ? '<p class="hint">Showing the newest 200. The backup has them all.</p>' : ""}</div>`;
+}
+
+/* ---- Sales (everyone's) ---- */
+function tSales() {
+  const S = store.sales, sum = S.reduce((a, s) => a + s.total, 0), ref = store.returns.reduce((a, r) => a + r.sticks, 0);
+  return `<div class="panel"><h3>All sales</h3><div class="stats"><div class="stat"><b>${S.length}</b><span>sales</span></div><div class="stat"><b>${sum}</b><span>${CONFIG.unit[1]} sold</span></div><div class="stat"><b>${ref}</b><span>refunded</span></div><div class="stat"><b>${sum - ref}</b><span>net ${CONFIG.unit[1]}</span></div></div>
+  <div class="sales">${salesRows(S.slice().reverse().slice(0, 100), saleReturns()) || "<p>No sales yet.</p>"}</div>${S.length > 100 ? '<p class="hint">Showing the newest 100. The backup has them all.</p>' : ""}</div>`;
+}
+
+/* ---- Backup ---- */
+function tBackup() {
+  return `<div class="panel"><h3>Backup</h3><p>The backup file has everything saved on this iPad: sales, returns, restocks, end-of-day counts, starting stock, the menu, and a stock snapshot.</p>
+  <div class="stats"><div class="stat"><b>${store.sales.length}</b><span>sales</span></div><div class="stat"><b>${store.returns.length}</b><span>return lines</span></div><div class="stat"><b>${store.restocks.length}</b><span>restock lines</span></div><div class="stat"><b>${store.counts.length}</b><span>counts</span></div></div>
+  <div class="row"><button class="btn sun" data-act="backup">Download backup</button></div>
+  <p class="hint">Saving on this iPad: ${canSave ? "working" : "OFF in this browser"}. Download a backup at the end of each day.</p></div>
+  <div class="panel"><h3>Restore from a backup</h3><p>If this iPad ever loses its saved data, load the newest backup file to put everything back. This replaces what is on the iPad now.</p>
+  <div class="row"><button class="btn" data-act="restorepick">Choose a backup file</button></div><input type="file" id="restorefile" accept=".json,application/json" style="display:none"></div>
+  <div class="panel"><h3>Practice mode</h3><p>Done testing? This clears sales, returns, restocks, counts and starting-stock changes on this iPad, and starts numbering from 1 again. It cannot be undone, so download a backup first.</p>
+  <p class="hint">Test sales already sent to the Google Sheet stay there. Clear those in the Sheet with the Clicker Caf\u00e9 menu &gt; Clear sales data.</p>
+  <div class="row"><button class="btn bad" data-act="reset">Clear test data</button></div></div>`;
+}
+function backup() {
+  const m = stockMap(), now = new Date();
+  const data = { app: "coffee-clicker-register", schema: 3, exportedAt: now.toISOString(), company: CONFIG.companyName, menuCache,
+    items: STOCK.map(e => ({ sku: e.sku, parent: e.parent, name: e.name, variant: e.variant, line: e.line, price: e.price })),
+    inventory: { asOf: now.toISOString(), rows: STOCK.map(i => ({ sku: i.sku, start: m[i.sku].start, restocked: m[i.sku].restock, sold: m[i.sku].sold, returnedToShelf: m[i.sku].back, damagedReturns: m[i.sku].damaged, countFixes: m[i.sku].adj, onHand: m[i.sku].on })) },
+    ...store };
+  const b = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "register-backup-" + localDate(now) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ============================================================
+   PHASE 3: GOOGLE SHEET (menu down, records up)
+   Records are saved on the iPad FIRST. The sync only copies them to the Sheet.
+   A record counts as sent only after the Sheet says it saved it (or already had it),
+   so wifi drops never lose anything: unsent records just wait and go next time.
+   ============================================================ */
+const syncOn = () => /^https:\/\//.test(CONFIG.sync.url || "");
+const SYNC_KINDS = [["sales", "sales"], ["returns", "returns"], ["restocks", "restocks"], ["counts", "counts"], ["startLog", "start"]];
+let sy = { busy: false, err: null, menuErr: null, menuBusy: false, check: null, timer: null };
+function unsent() {
+  const out = [];
+  SYNC_KINDS.forEach(([k, type]) => (store[k] || []).forEach(r => { if (r && r.id && !store.sent[r.id] && !store.syncBad[r.id]) out.push({ type, r }); }));
+  return out;
+}
+function outgoing(x) {   // add readable names so the Sheet rows make sense on their own
+  const o = { type: x.type, ...x.r };
+  if (x.type === "restocks" || x.type === "start") o.label = dispName(itemOf(o.sku));
+  if (x.type === "counts") o.rows = (o.rows || []).map(w => ({ ...w, label: dispName(itemOf(w.sku)) }));
+  return o;
+}
+async function sheetCall(params, body) {
+  const ctl = typeof AbortController === "function" ? new AbortController() : null, t = ctl && setTimeout(() => ctl.abort(), 25000);
+  try {
+    const url = CONFIG.sync.url + (params ? (CONFIG.sync.url.includes("?") ? "&" : "?") + params : "");
+    const r = await fetch(url, body ? { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body), redirect: "follow", signal: ctl && ctl.signal }
+                                    : { redirect: "follow", signal: ctl && ctl.signal });
+    const txt = await r.text();
+    let j; try { j = JSON.parse(txt); } catch (e) { throw new Error("The Sheet sent back something unexpected. Check the web app URL, and that access is set to Anyone."); }
+    if (!j.ok) throw new Error(j.error === "bad key" ? "The Sheet did not accept the key. CONFIG.sync.key must match SECRET in the Apps Script." : (j.error || "The Sheet said no."));
+    return j;
+  } catch (e) {
+    if (e && e.name === "AbortError") throw new Error("The Sheet took too long to answer.");
+    if (e instanceof TypeError) throw new Error(navigator.onLine === false ? "No wifi right now." : "Could not reach the Sheet.");
+    throw e;
+  } finally { t && clearTimeout(t); }
+}
+function syncSoon() { if (!syncOn()) return; clearTimeout(sy.timer); sy.timer = setTimeout(syncNow, 1500); }
+async function syncNow() {
+  if (!syncOn() || sy.busy) return;
+  const q = unsent();
+  if (!q.length) { sy.err = null; drawSyncBits(); return; }
+  sy.busy = true; drawSyncBits();
+  try {
+    for (let i = 0; i < q.length; i += 50) {
+      const res = await sheetCall(null, { key: CONFIG.sync.key, device: store.device, records: q.slice(i, i + 50).map(outgoing) });
+      [...(res.saved || []), ...(res.dup || [])].forEach(id => store.sent[id] = 1);
+      (res.bad || []).forEach(id => store.syncBad[id] = 1);
+      store.lastSync = new Date().toISOString(); persist();
+    }
+    sy.err = null;
+  } catch (e) { sy.err = e.message || "Could not reach the Sheet."; }
+  sy.busy = false; persist(); drawSyncBits();
+}
+async function fetchMenu(manual) {
+  if (!syncOn() || sy.menuBusy) return;
+  sy.menuBusy = true; if (manual) drawSyncBits();
+  try {
+    const j = await sheetCall("action=menu&key=" + encodeURIComponent(CONFIG.sync.key));
+    const prob = menuProblem(j.menu);
+    if (prob) throw new Error(prob + " Keeping the menu the register already has.");
+    if (!menuCache || menuCache.version !== j.version) {
+      menuCache = { version: j.version, fetchedAt: new Date().toISOString(), menu: j.menu };
+      try { localStorage.setItem(MENU_KEY, JSON.stringify(menuCache)); } catch (e) {}
+    } else { menuCache.fetchedAt = new Date().toISOString(); try { localStorage.setItem(MENU_KEY, JSON.stringify(menuCache)); } catch (e) {} }
+    sy.menuErr = null;
+    if (menuWaiting()) {
+      if (!user) { const p = pin; applyMenu(menuCache); showLogin(); pin = p; dots(); }   // nobody signed in: use it now (keeps a half-typed PIN)
+      else if (manual) { applyMenu(menuCache); cart = {}; toast("New menu is in!"); }
+      else toast("A new menu is ready. It starts at the next sign-in.");
+    } else if (manual) toast("Menu is up to date");
+  } catch (e) { sy.menuErr = e.message; if (manual) toast("Menu: " + e.message); }
+  sy.menuBusy = false; drawSyncBits();
+}
+async function checkSheet() {
+  sy.check = { busy: true }; drawSyncBits();
+  try { const j = await sheetCall("action=ping&key=" + encodeURIComponent(CONFIG.sync.key) + "&device=" + encodeURIComponent(store.device));
+        sy.check = { at: new Date().toISOString(), sheet: j.received, sent: Object.keys(store.sent).length }; }
+  catch (e) { sy.check = { err: e.message }; }
+  drawSyncBits();
+}
+function drawChip() {
+  const c = $("#syncchip"); if (!c) return;
+  if (!syncOn()) { c.innerHTML = isMgr() ? '<span class="sync off">Sheet sync off</span>' : ""; return; }
+  const n = unsent().length;
+  c.innerHTML = sy.busy ? '<span class="sync busy">Sending&hellip;</span>'
+    : !n ? '<span class="sync ok">&#10003; Saved to Sheet</span>'
+    : `<span class="sync wait">${n} waiting${sy.err ? " &middot; " + (navigator.onLine === false ? "no wifi" : "will retry") : ""}</span>`;
+}
+function drawSyncBits() { drawChip(); if ($("#omain") && (ost.tab === "sync" || ost.tab === "menu") && !$("#modal").classList.contains("show")) renderOffice(); }
+const ago = t => { if (!t) return "never"; const s = Math.round((Date.now() - new Date(t)) / 1000); return s < 60 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago" : fmtDay(t) + " " + fmtTime(t); };
+
+/* ---- Back office: Menu ---- */
+function historySkus() {
+  const known = new Set(STOCK.map(e => e.sku)), seen = {};
+  store.sales.forEach(s => s.lines.forEach(l => seen[l.sku] = 1)); store.returns.forEach(r => seen[r.sku] = 1);
+  store.restocks.forEach(r => seen[r.sku] = 1); store.counts.forEach(c => c.rows.forEach(w => seen[w.sku] = 1)); Object.keys(store.start).forEach(k => seen[k] = 1);
+  return Object.keys(seen).filter(k => !known.has(k));
+}
+function tMenu() {
+  const notes = setupNotes(), lost = historySkus(), off = ITEMS.filter(i => !onMenu(i));
+  const src = menuInfo.source === "sheet" ? `From the Google Sheet (version ${esc(menuInfo.version)}), downloaded ${ago(menuCache && menuCache.fetchedAt)}.` : "Built-in menu from the register file." + (syncOn() ? " Tap Get latest menu to load the Sheet's menu." : " Turn on Sheet sync to load the menu from the Sheet.");
+  const rows = ITEMS.map(i => { const n = STOCK.filter(e => e.parent === i.sku).length;
+    return `<div class="rec"><b>${esc(i.sku)} &middot; ${esc(i.name)}</b> ${onMenu(i) ? "" : '<span class="chip">Off</span>'} <small>${esc(CONFIG.lines[i.line] || i.line)} &middot; ${sticks(i.price)} &middot; start ${i.stock}${i.options.length ? " &middot; " + i.options.map(o => esc(o.label) + ": " + o.values.map(v => esc(v.name)).join(", ")).join(" | ") + " &middot; " + (i.trackStock === "item" ? "one shared stock" : n + " combos counted") : ""}${i.cost != null ? " &middot; costs $" + Number(i.cost).toFixed(2) : ""}</small></div>`; }).join("");
+  return `<div class="panel"><h3>Menu</h3><p>${src}</p>
+  ${menuWaiting() ? '<p class="err">A newer menu has downloaded. It starts at the next sign-in, or tap Use it now.</p>' : ""}
+  ${sy.menuErr ? `<p class="err">${esc(sy.menuErr)}</p>` : ""}
+  <div class="row">${syncOn() ? `<button class="btn go" data-act="menufetch" ${sy.menuBusy ? "disabled" : ""}>${sy.menuBusy ? "Getting menu&hellip;" : "Get latest menu"}</button>` : ""}${menuWaiting() ? '<button class="btn sun" data-act="menuapply">Use it now</button>' : ""}</div>
+  <p class="hint">Edit the menu on the Sheet's Menu and Options tabs, then tap Get latest menu. Once an item has sales, keep its SKU and codes the same. To stop selling something, untick On menu? instead of deleting the row, so old sales still have a name.</p></div>
+  ${notes.length || lost.length ? `<div class="panel"><h3>Check these</h3>${notes.map(n => `<p class="err">${esc(n)}</p>`).join("")}${lost.length ? `<p class="err">These SKUs have sales or stock history but are not on the menu anymore: ${lost.map(esc).join(", ")}. Put them back (and untick On menu?) so their history keeps a name.</p>` : ""}</div>` : ""}
+  <div class="panel"><h3>${ITEMS.length} items${off.length ? " (" + off.length + " switched off)" : ""}</h3>${rows}</div>`;
+}
+
+/* ---- Back office: Sheet sync ---- */
+function tSync() {
+  if (!syncOn()) return `<div class="panel"><h3>Sheet sync is off</h3><p>Everything is still saved on this iPad. To send it to the Google Sheet, paste the Apps Script <b>Web app URL</b> into <code>CONFIG.sync.url</code> at the top of the register file, then reload.</p><p class="hint">This iPad's ID: ${esc(store.device)}</p></div>`;
+  const n = unsent().length, bad = Object.keys(store.syncBad).length, c = sy.check;
+  const kinds = SYNC_KINDS.map(([k, t]) => { const all = (store[k] || []).length, w = (store[k] || []).filter(r => !store.sent[r.id]).length; return `<div class="stat"><b>${all - w}/${all}</b><span>${{ sales: "sales", returns: "return lines", restocks: "restock lines", counts: "counts", start: "start changes" }[t]} sent</span></div>`; }).join("");
+  let chk = "";
+  if (c && c.busy) chk = "<p>Asking the Sheet&hellip;</p>";
+  else if (c && c.err) chk = `<p class="err">${esc(c.err)}</p>`;
+  else if (c) chk = c.sheet >= c.sent ? `<p><span class="chip ok">All there</span> The Sheet has ${c.sheet} records from this iPad, and this iPad has sent ${c.sent}. (checked ${ago(c.at)})</p>`
+    : `<p><span class="chip bad">Missing</span> The Sheet has only ${c.sheet} of the ${c.sent} records this iPad sent. That happens if rows were cleared in the Sheet. Tap Send everything again; the Sheet skips anything it already has.</p><div class="row"><button class="btn sun" data-act="resendall">Send everything again</button></div>`;
+  return `<div class="panel"><h3>Sheet sync</h3>
+  <div class="stats"><div class="stat"><b>${n}</b><span>waiting to send</span></div><div class="stat"><b>${ago(store.lastSync)}</b><span>last sent</span></div>${bad ? `<div class="stat"><b>${bad}</b><span>refused by Sheet</span></div>` : ""}</div>
+  ${sy.err ? `<p class="err">${esc(sy.err)} Records are safe on this iPad and will send later.</p>` : n ? "" : "<p>Everything on this iPad is in the Sheet.</p>"}
+  <div class="row"><button class="btn go" data-act="syncnow" ${sy.busy ? "disabled" : ""}>${sy.busy ? "Sending&hellip;" : "Send now"}</button><button class="btn" data-act="synccheck">Check the Sheet</button></div>${chk}
+  <p class="hint">Sends on its own every ${CONFIG.sync.everySeconds} seconds and right after each sale. This iPad's ID: ${esc(store.device)}.</p></div>
+  <div class="panel"><h3>What has been sent</h3><div class="stats">${kinds}</div></div>`;
+}
+
+/* ---- Restore from a backup file ---- */
+function restoreFrom(text) {
+  let d; try { d = JSON.parse(text); } catch (e) { toast("That file is not a register backup."); return; }
+  if (!d || d.app !== "coffee-clicker-register" || !Array.isArray(d.sales)) { toast("That file is not a register backup."); return; }
+  const when = d.exportedAt ? fmtDay(d.exportedAt) + " " + fmtTime(d.exportedAt) : "an unknown time";
+  ask(`Replace everything on this iPad with the backup from ${when}? (${d.sales.length} sales)`, "Restore", () => {
+    const s = blank(), arr = k => Array.isArray(d[k]) ? d[k] : [];
+    s.device = typeof d.device === "string" ? d.device : store.device;
+    ["sales", "returns", "restocks", "counts", "startLog"].forEach(k => s[k] = arr(k));
+    s.start = d.start && typeof d.start === "object" ? d.start : {};
+    s.draft = d.draft && d.draft.counted ? d.draft : { counted: {}, reason: {} };
+    const maxNo = (list, f) => list.reduce((a, x) => Math.max(a, Number(x[f]) || 0), 0);
+    s.next = Math.max(Number(d.next) || 1, maxNo(s.sales, "no") + 1);
+    s.nextRet = Math.max(Number(d.nextRet) || 1, maxNo(s.returns, "no") + 1);
+    s.nextCount = Math.max(Number(d.nextCount) || 1, maxNo(s.counts, "no") + 1);
+    s.sent = {};   // send it all again; the Sheet skips anything it already has
+    store = s; persist();
+    if (d.menuCache && d.menuCache.menu && !menuProblem(d.menuCache.menu)) { menuCache = d.menuCache; try { localStorage.setItem(MENU_KEY, JSON.stringify(menuCache)); } catch (e) {} applyMenu(menuCache); }
+    closeModal(); renderOffice(); toast("Backup restored!"); syncSoon();
+  });
+}
+
+/* ---- keep it moving ---- */
+if (syncOn()) {
+  setInterval(syncNow, Math.max(10, CONFIG.sync.everySeconds || 30) * 1000);
+  setInterval(() => fetchMenu(false), 10 * 60 * 1000);
+  window.addEventListener("online", () => { syncNow(); fetchMenu(false); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { syncNow(); fetchMenu(false); } });
+  setTimeout(() => { syncNow(); fetchMenu(false); }, 800);
+}
+
+/* ---------- one click handler for everything ---------- */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const d = b.dataset, a = d.act;
+  const redo = () => { if ($("#omain")) renderOffice(); };
+  if (a === "key") { if (pin.length < 4) { pin += d.d; dots(); $("#pinmsg").textContent = ""; if (pin.length === 4) setTimeout(tryPin, 120); } }
+  else if (a === "pback") { pin = pin.slice(0, -1); dots(); }
+  else if (a === "pclear") { pin = ""; dots(); }
+  else if (a === "tab") { tab = d.k; drawTabs(); drawGrid(); }
+  else if (a === "add") { const i = optItem(d.sku); i && i.options && i.options.length ? openPicker(d.sku) : addToCart(d.sku); }
+  else if (a === "pickv") pickValue(parseInt(d.i, 10));
+  else if (a === "pback2") { if (pk.picks.length) { pk.picks.pop(); drawPicker(); } else { pk = null; closeModal(); } }
+  else if (a === "inc") { cart[d.k] = Math.min(99, (cart[d.k] || 0) + 1); drawCart(); }
+  else if (a === "dec") { if (--cart[d.k] <= 0) delete cart[d.k]; drawCart(); }
+  else if (a === "clearcart") ask("Clear this whole order?", "Clear it", () => { cart = {}; drawCart(); closeModal(); });
+  else if (a === "charge") { tender = ""; payScreen(); }
+  else if (a === "pkey") { if (tender.length < 3) { tender = (tender + d.d).replace(/^0+/, ""); payScreen(); } }
+  else if (a === "pbk") { tender = tender.slice(0, -1); payScreen(); }
+  else if (a === "pclr") { tender = ""; payScreen(); }
+  else if (a === "exact") { tender = String(total()); payScreen(); }
+  else if (a === "setpay") { tender = d.n; payScreen(); }
+  else if (a === "done") completeSale();
+  else if (a === "close") closeModal();
+  else if (a === "yes") { const f = pending; pending = null; f && f(); }
+  else if (a === "sales") salesSheet();
+  else if (a === "backup") backup();
+  else if (a === "reset") ask("Delete ALL test data on this iPad?", "Delete", () => { const keep = store.device; store = blank(); store.device = keep; save(); rs = null; closeModal(); renderOffice(); toast("Practice data cleared"); });
+  else if (a === "lock") {
+    const out = () => { closeModal(); showLogin(); };
+    Object.keys(cart).length ? ask("Lock the register? The open order will be cleared.", "Lock it", out) : out();
+  }
+  /* returns */
+  else if (a === "return") startReturn();
+  else if (a === "rcancel") { ret = null; closeModal(); }
+  else if (a === "rsale") { ret.sale = store.sales.find(s => s.id === d.id); ret.picks = {}; ret.step = "items"; drawReturn(); }
+  else if (a === "rnosale") { ret.sale = null; ret.picks = {}; ret.step = "items"; drawReturn(); }
+  else if (a === "rnum") { ret.step = "num"; ret.num = ""; ret.err = ""; drawReturn(); }
+  else if (a === "rkey") { if (ret.num.length < 5) { ret.num = (ret.num + d.d).replace(/^0+/, ""); ret.err = ""; drawReturn(); } }
+  else if (a === "rbk") { ret.num = ret.num.slice(0, -1); ret.err = ""; drawReturn(); }
+  else if (a === "rclr") { ret.num = ""; ret.err = ""; drawReturn(); }
+  else if (a === "rgo") { const s = store.sales.find(x => x.no === parseInt(ret.num, 10)); if (s) { ret.sale = s; ret.picks = {}; ret.step = "items"; } else ret.err = "No sale #" + ret.num + " on this iPad."; drawReturn(); }
+  else if (a === "rback") { ret.step = ret.step === "reason" ? "items" : "find"; drawReturn(); }
+  else if (a === "rinc") { const l = retLines().find(x => x.k === d.k); ret.picks[d.k] = Math.min(l.max, (ret.picks[d.k] || 0) + 1); drawReturn(); }
+  else if (a === "rdec") { ret.picks[d.k] = Math.max(0, (ret.picks[d.k] || 0) - 1); drawReturn(); }
+  else if (a === "rnext") { ret.step = "reason"; drawReturn(); }
+  else if (a === "rreason") { ret.reason = d.id; drawReturn(); }
+  else if (a === "rdone") finishReturn();
+  else if (a === "rfinish") { ret = null; closeModal(); }
+  /* number pad popup */
+  else if (a === "nkey") { if (nm.fresh) { nm.v = ""; nm.fresh = false; } if (nm.v.length < 4) { nm.v = (nm.v + d.d).replace(/^0+(?=\d)/, ""); drawNum(); } }
+  else if (a === "nbk") { nm.fresh = false; nm.v = nm.v.slice(0, -1); drawNum(); }
+  else if (a === "nclr") { nm.v = ""; drawNum(); }
+  else if (a === "nclose") { nm = null; closeModal(); }
+  else if (a === "nok") { const f = nm.cb, v = parseInt(nm.v, 10); nm = null; closeModal(); f(v); }
+  /* back office */
+  else if (a === "office") showOffice("stock");
+  else if (a === "toreg") showRegister();
+  else if (a === "otab") { ost.tab = d.k; renderOffice(); $("#omain").scrollTop = 0; }
+  else if (a === "editstart") numModal("Starting stock", dispName(itemOf(d.sku)) + " (" + d.sku + ")", startOf(d.sku), v => { const now = new Date(); store.start[d.sku] = { qty: v, time: now.toISOString(), by: user.name };
+    store.startLog.push({ id: uid("ST"), time: now.toISOString(), date: localDate(now), device: store.device, by: user.name, sku: d.sku, qty: v }); save(); redo(); toast("Starting stock saved"); });
+  else if (a === "rsinc") { rs.qty[d.sku] = Math.min(999, (rs.qty[d.sku] || 0) + parseInt(d.n, 10)); redo(); }
+  else if (a === "rsdec") { rs.qty[d.sku] = Math.max(0, (rs.qty[d.sku] || 0) - 1); if (!rs.qty[d.sku]) delete rs.qty[d.sku]; redo(); }
+  else if (a === "rsclear") { rs.qty = {}; redo(); }
+  else if (a === "rssave") {
+    const now = new Date(), batch = uid("B"), date = rs.date || localDate(now); let n = 0;
+    Object.entries(rs.qty).forEach(([sku, q]) => { if (q > 0) { n += q; store.restocks.push({ id: uid("RS"), batch, time: now.toISOString(), date, device: store.device, by: user.name, sku, qty: q }); } });
+    save(); rs = { date: localDate(), qty: {} }; redo(); toast(n + " pieces added to stock");
+  }
+  else if (a === "cnum") { const sku = d.sku, exp = stockMap()[sku].on; numModal("Count: " + dispName(itemOf(sku)), "The register expects " + exp + ". How many are on the shelf?", store.draft.counted[sku], v => { store.draft.counted[sku] = v; const ok = v === exp ? [] : (v < exp ? CONFIG.countReasons.short : CONFIG.countReasons.extra); if (!ok.some(o => o.id === store.draft.reason[sku])) delete store.draft.reason[sku]; save(); redo(); }); }
+  else if (a === "callmatch") { countRows().filter(r => !r.has).forEach(r => { store.draft.counted[r.i.sku] = r.exp; }); save(); redo(); }
+  else if (a === "creason") { store.draft.reason[d.sku] = d.id; save(); redo(); }
+  else if (a === "cclear") ask("Clear the numbers you typed?", "Start over", () => { store.draft = { counted: {}, reason: {} }; save(); closeModal(); redo(); });
+  /* menu, sheet sync, restore */
+  else if (a === "menufetch") fetchMenu(true);
+  else if (a === "menuapply") { applyMenu(menuCache); cart = {}; renderOffice(); toast("New menu is in!"); }
+  else if (a === "syncnow") syncNow();
+  else if (a === "synccheck") checkSheet();
+  else if (a === "resendall") ask("Send every record on this iPad to the Sheet again? Rows it already has are skipped.", "Send again", () => { store.sent = {}; store.syncBad = {}; persist(); sy.check = null; closeModal(); syncNow(); });
+  else if (a === "restorepick") { const f = $("#restorefile"); if (f) { f.value = ""; f.click(); } }
+  else if (a === "csave") ask("Save this count? Stock will be set to the numbers you counted.", "Save count", saveCount);
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "rsdate" && rs) rs.date = e.target.value || localDate();
+  if (e.target.id === "restorefile" && e.target.files && e.target.files[0]) { const r = new FileReader(); r.onload = () => restoreFrom(String(r.result)); r.readAsText(e.target.files[0]); }
+});
+showLogin();
+</script>
+</body>
+</html>
